@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:art_gallery_app/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -26,9 +27,13 @@ class SignupScreen extends StatelessWidget {
 
       if (response.statusCode == 201) {
         // Successful signup
-        Navigator.pushNamed(context, '/image_details');
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
       } else {
         // Handle errors
+        print('Failed to sign up. Response body: ${response.body}');
         showDialog(
           context: context,
           builder: (BuildContext context) {
