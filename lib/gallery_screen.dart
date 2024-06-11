@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:art_gallery_app/art_description_screen.dart';
 import 'package:art_gallery_app/buy_screen.dart';
+import 'package:art_gallery_app/galleryScreenAdmin.dart';
 import 'package:art_gallery_app/selling_art_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -60,7 +61,25 @@ class _GalleryScreenState extends State<GalleryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Art Gallery'),
+        title: Container(
+            child: Row(
+          children: [
+            Text('Art Gallery'),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.2,
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => GalleryScreenAdmin(),
+                    ));
+              },
+              child: Text('Admin'),
+            )
+          ],
+        )),
       ),
       body: GridView.builder(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -94,46 +113,17 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 SizedBox(height: 8.0),
                 Text(arts[index]['description']), // Display description
                 SizedBox(height: 8.0),
-                Row(
-                  children: [
-                    TextButton(
-                      onPressed: () async {
-                        try {
-                          // Send a DELETE request to the server to delete the item
-                          final response = await http.delete(
-                            Uri.parse(
-                                'http://localhost:8000/api/delete/${arts[index]['id']}'),
-                          );
-
-                          if (response.statusCode == 200) {
-                            // If deletion is successful, update the local lists
-                            setState(() {
-                              arts.removeAt(index);
-                              imagePaths.removeAt(index);
-                            });
-                          } else {
-                            // Handle error response from the server
-                            print(
-                                'Failed to delete item. Status code: ${response.statusCode}');
-                          }
-                        } catch (error) {
-                          // Handle network or server errors
-                          print('Error deleting item: $error');
-                        }
-                      },
-                      child: Text('Delete'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BuyScreen(),
-                            ));
-                      },
-                      child: Text('Buy'),
-                    ),
-                  ],
+                Center(
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BuyScreen(),
+                          ));
+                    },
+                    child: Text('Buy'),
+                  ),
                 ),
               ],
             ),
