@@ -3,10 +3,81 @@ import 'package:art_gallery_app/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class SignupScreen extends StatelessWidget {
+class SignupScreen extends StatefulWidget {
+  @override
+  State<SignupScreen> createState() => _SignupScreenState();
+}
+
+class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController usernameController = TextEditingController();
+
   final TextEditingController emailController = TextEditingController();
+
   final TextEditingController passwordController = TextEditingController();
+
+  String? selectedRole;
+  Future<void> signUp1(BuildContext context) async {
+    final String baseUrl = 'http://127.0.0.1:8000/api/register1';
+
+    try {
+      final response = await http.post(
+        Uri.parse(baseUrl),
+        body: jsonEncode({
+          'name': usernameController.text,
+          'email': emailController.text,
+          'password': passwordController.text,
+          'role': selectedRole ?? 'buyer', // Include role or default to 'buyer'
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 201) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
+      } else {
+        print('Failed to sign up. Response body: ${response.body}');
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Error'),
+              content: Text('Failed to sign up. Please try again.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (error) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Network error. Please check your connection.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
 
   Future<void> signUp(BuildContext context) async {
     final String baseUrl =
@@ -19,6 +90,7 @@ class SignupScreen extends StatelessWidget {
           'name': usernameController.text,
           'email': emailController.text,
           'password': passwordController.text,
+          // 'role': selectedRole ?? '',
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +182,6 @@ class SignupScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            
             Text('Signup'),
           ],
         ),
@@ -149,6 +220,31 @@ class SignupScreen extends StatelessWidget {
                           decoration: InputDecoration(labelText: 'Password'),
                           obscureText: true,
                         ),
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.center,
+                        //   children: [
+                        //     Radio<String>(
+                        //       value: 'seller',
+                        //       groupValue: selectedRole,
+                        //       onChanged: (String? value) {
+                        //         setState(() {
+                        //           selectedRole = value;
+                        //         });
+                        //       },
+                        //     ),
+                        //     Text('seller'),
+                        //     Radio<String>(
+                        //       value: 'buyer',
+                        //       groupValue: selectedRole,
+                        //       onChanged: (String? value) {
+                        //         setState(() {
+                        //           selectedRole = value;
+                        //         });
+                        //       },
+                        //     ),
+                        //     Text('buyer'),
+                        //   ],
+                        // ),
                         SizedBox(height: 20),
                         ElevatedButton(
                           onPressed: () => signUp(context),
