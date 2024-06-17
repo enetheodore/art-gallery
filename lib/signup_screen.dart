@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:art_gallery_app/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
 class SignupScreen extends StatefulWidget {
   @override
@@ -9,14 +11,26 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  File? _profileImage;
+  final picker = ImagePicker();
   final TextEditingController usernameController = TextEditingController();
-
   final TextEditingController emailController = TextEditingController();
-
   final TextEditingController passwordController = TextEditingController();
-
   String? selectedRole;
-  Future<void> signUp1(BuildContext context) async {
+
+  Future<void> pickProfileImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _profileImage = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
+  Future<void> signUp(BuildContext context) async {
     final String baseUrl = 'http://127.0.0.1:8000/api/register1';
 
     try {
@@ -26,7 +40,7 @@ class _SignupScreenState extends State<SignupScreen> {
           'name': usernameController.text,
           'email': emailController.text,
           'password': passwordController.text,
-          'role': selectedRole ?? 'buyer', // Include role or default to 'buyer'
+          'role': selectedRole ?? 'buyer',
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -34,6 +48,10 @@ class _SignupScreenState extends State<SignupScreen> {
       );
 
       if (response.statusCode == 201) {
+        final userId = jsonDecode(response.body)['user']['id'];
+        if (_profileImage != null) {
+          await uploadProfilePicture(userId);
+        }
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -59,6 +77,7 @@ class _SignupScreenState extends State<SignupScreen> {
         );
       }
     } catch (error) {
+      print('Sign up error: $error');
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -79,70 +98,28 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  Future<void> signUp(BuildContext context) async {
-    final String baseUrl =
-        'http://127.0.0.1:8000/api/register'; // Replace with your Laravel backend URL
-
+  Future<void> uploadProfilePicture(int userId) async {
     try {
-      final response = await http.post(
-        Uri.parse(baseUrl),
-        body: jsonEncode({
-          'name': usernameController.text,
-          'email': emailController.text,
-          'password': passwordController.text,
-          // 'role': selectedRole ?? '',
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('http://127.0.0.1:8000/api/upload_profile_picture'),
       );
+      request.fields['userId'] = userId.toString();
+      request.files.add(await http.MultipartFile.fromPath(
+          'profile_picture', _profileImage!.path));
 
-      if (response.statusCode == 201) {
-        // Successful signup
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => LoginScreen()),
-        );
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        print('Profile picture uploaded successfully');
       } else {
-        // Handle errors
-        print('Failed to sign up. Response body: ${response.body}');
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Error'),
-              content: Text('Failed to sign up. Please try again.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+        print('Failed to upload profile picture: ${response.reasonPhrase}');
+        response.stream.transform(utf8.decoder).listen((value) {
+          print('Server response: $value');
+        });
       }
     } catch (error) {
-      // Handle network errors
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text('Network error. Please check your connection.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+      print('Upload error: $error');
     }
   }
 
@@ -150,128 +127,78 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: Container(
-          width: 390,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color.fromARGB(255, 0, 51, 102).withOpacity(0.5), // Dark blue
-                Colors.transparent,
-                Colors.transparent,
-                Color.fromARGB(255, 0, 51, 102).withOpacity(0.5), // Dark blue
-              ],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.blue
-                    .withOpacity(0.2), // Adjust the shadow color here
-                blurRadius: 5.0,
-                spreadRadius: 1.0,
-                offset: Offset(0, 3),
-              ),
-            ],
-          ),
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20.0),
-            topRight: Radius.circular(20.0),
-          ),
-        ),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text('Signup'),
-          ],
-        ),
+        title: Text('Signup'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
           child: Stack(
             children: [
-              Image.asset(
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width,
-                'assets/images/bmw.png',
-                fit: BoxFit.cover,
-              ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Card(
-                    color: Colors.white.withOpacity(0.7),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextField(
-                          controller: usernameController,
-                          decoration: InputDecoration(labelText: 'Username'),
-                        ),
-                        TextField(
-                          controller: emailController,
-                          decoration: InputDecoration(labelText: 'Email'),
-                          keyboardType: TextInputType.emailAddress,
-                        ),
-                        TextField(
-                          controller: passwordController,
-                          decoration: InputDecoration(labelText: 'Password'),
-                          obscureText: true,
-                        ),
-                        // Row(
-                        //   mainAxisAlignment: MainAxisAlignment.center,
-                        //   children: [
-                        //     Radio<String>(
-                        //       value: 'seller',
-                        //       groupValue: selectedRole,
-                        //       onChanged: (String? value) {
-                        //         setState(() {
-                        //           selectedRole = value;
-                        //         });
-                        //       },
-                        //     ),
-                        //     Text('seller'),
-                        //     Radio<String>(
-                        //       value: 'buyer',
-                        //       groupValue: selectedRole,
-                        //       onChanged: (String? value) {
-                        //         setState(() {
-                        //           selectedRole = value;
-                        //         });
-                        //       },
-                        //     ),
-                        //     Text('buyer'),
-                        //   ],
-                        // ),
-                        SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () => signUp(context),
-                          child: Text('Sign Up'),
-                        ),
-                      ],
+                  GestureDetector(
+                    onTap: pickProfileImage,
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundImage: _profileImage != null
+                          ? FileImage(_profileImage!)
+                          : AssetImage('assets/images/placeholder.png')
+                              as ImageProvider,
+                      child: _profileImage == null
+                          ? Icon(Icons.camera_alt, size: 50)
+                          : null,
                     ),
+                  ),
+                  TextField(
+                    controller: usernameController,
+                    decoration: InputDecoration(labelText: 'Username'),
+                  ),
+                  TextField(
+                    controller: emailController,
+                    decoration: InputDecoration(labelText: 'Email'),
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  TextField(
+                    controller: passwordController,
+                    decoration: InputDecoration(labelText: 'Password'),
+                    obscureText: true,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Radio<String>(
+                        value: 'seller',
+                        groupValue: selectedRole,
+                        onChanged: (String? value) {
+                          setState(() {
+                            selectedRole = value;
+                          });
+                        },
+                      ),
+                      Text('seller'),
+                      Radio<String>(
+                        value: 'buyer',
+                        groupValue: selectedRole,
+                        onChanged: (String? value) {
+                          setState(() {
+                            selectedRole = value;
+                          });
+                        },
+                      ),
+                      Text('buyer'),
+                    ],
+                  ),
+                  ElevatedButton(
+                    onPressed: () => signUp(context),
+                    child: Text('Sign Up'),
                   ),
                 ],
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class ImageDetailsScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Image Details'),
-      ),
-      body: Center(
-        child: Text('Image Details Screen'),
       ),
     );
   }

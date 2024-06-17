@@ -1,10 +1,12 @@
 import 'dart:convert';
-import 'package:art_gallery_app/art_description_screen.dart';
-import 'package:art_gallery_app/buy_screen.dart';
-import 'package:art_gallery_app/galleryScreenAdmin.dart';
-import 'package:art_gallery_app/selling_art_screen.dart';
+import 'dart:io';
+import 'package:art_gallery_app/profilePic.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'art_description_screen.dart';
+import 'buy_screen.dart';
+import 'galleryScreenAdmin.dart';
+import 'selling_art_screen.dart';
 
 class GalleryScreen extends StatefulWidget {
   @override
@@ -47,13 +49,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
         });
       } else {
         print('Failed to fetch arts data. Status code: ${response.statusCode}');
-        print('imagePaths length: ${imagePaths.length}');
-        print('arts length: ${arts.length}');
       }
     } catch (error) {
       print('Error fetching arts data: $error');
-      print('imagePaths length: ${imagePaths.length}');
-      print('arts length: ${arts.length}');
     }
   }
 
@@ -61,25 +59,77 @@ class _GalleryScreenState extends State<GalleryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Container(
-            child: Row(
+        title: Text('Art Gallery'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GalleryScreenAdmin(),
+                ),
+              );
+            },
+            icon: Icon(Icons.admin_panel_settings),
+          ),
+        ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: [
-            Text('Art Gallery'),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.2,
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
             ),
-            TextButton(
-              onPressed: () {
+            ListTile(
+              leading: Icon(Icons.monetization_on),
+              title: Text('Sell Art'),
+              onTap: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => GalleryScreenAdmin(),
-                    ));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SellingArtScreen(),
+                  ),
+                );
               },
-              child: Text('Admin'),
-            )
+            ),
+            ListTile(
+              leading: Icon(Icons.person),
+              title: Text('Profile'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfilePictureUploaderWidget(
+                      onPictureSelected: (File imageFile) {
+                        // Handle the selected profile picture here (e.g., upload to server)
+                        // For demonstration, you can set a placeholder image in the UI
+                        // or use the selected image for further processing.
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.exit_to_app),
+              title: Text('Logout'),
+              onTap: () {
+                // Implement logout functionality
+              },
+            ),
           ],
-        )),
+        ),
       ),
       body: GridView.builder(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -92,14 +142,16 @@ class _GalleryScreenState extends State<GalleryScreen> {
           return GestureDetector(
             onTap: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ArtDescriptionScreen(
-                        imageUrl: 'http://localhost:8000/${imagePaths[index]}',
-                        title: '',
-                        artist: 'me',
-                        description: arts[index]['description']),
-                  ));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ArtDescriptionScreen(
+                    imageUrl: 'http://localhost:8000/${imagePaths[index]}',
+                    title: '',
+                    artist: 'me',
+                    description: arts[index]['description'],
+                  ),
+                ),
+              );
             },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -117,10 +169,11 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   child: TextButton(
                     onPressed: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BuyScreen(),
-                          ));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BuyScreen(),
+                        ),
+                      );
                     },
                     child: Text('Buy'),
                   ),
