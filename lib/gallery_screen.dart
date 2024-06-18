@@ -1,16 +1,18 @@
 import 'dart:convert';
-import 'dart:io';
+import 'package:art_gallery_app/galleryScreenAdmin.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'art_description_screen.dart';
 import 'buy_screen.dart';
-import 'galleryScreenAdmin.dart';
 import 'selling_art_screen.dart';
-import 'profilePic.dart'; // Assuming you have this file for profile picture upload functionality
+
+import 'profilePic.dart';
 
 class GalleryScreen extends StatefulWidget {
-  final String userId;
-  GalleryScreen({required this.userId});
+  final int userId;
+  final String? profilePictureUrl;
+
+  GalleryScreen({required this.userId, this.profilePictureUrl});
 
   @override
   _GalleryScreenState createState() => _GalleryScreenState();
@@ -19,36 +21,30 @@ class GalleryScreen extends StatefulWidget {
 class _GalleryScreenState extends State<GalleryScreen> {
   List<Map<String, dynamic>> arts = [];
   List<String> imagePaths = [];
-  String? profilePictureUrl;
+
+  late int userId; // Remove 'late' keyword
 
   @override
   void initState() {
     super.initState();
+    userId = widget.userId; // Initialize userId here
     fetchArtsDataFromServer();
-    fetchProfilePicFromServer();
+    // WidgetsBinding.instance!.addPostFrameCallback((_) {
+    //   _navigateToGalleryScreen();
+    // });
   }
 
-  Future<void> fetchProfilePicFromServer() async {
-    try {
-      final userId = widget.userId;
-      final response = await http.get(
-          Uri.parse('http://127.0.0.1:8000/api/profile_picture/$userId'));
-
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        setState(() {
-          profilePictureUrl = responseData['profile_picture'];
-        });
-      } else if (response.statusCode == 404) {
-        print('Profile picture not found for user with email: $userId');
-      } else {
-        print(
-            'Failed to fetch profile picture. Status code: ${response.statusCode}');
-      }
-    } catch (error) {
-      print('Error fetching profile picture: $error');
-    }
-  }
+  // void _navigateToGalleryScreen() {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => GalleryScreen(
+  //         userId: widget.userId, // Pass userId from widget, not from state
+  //         profilePictureUrl: 'http://localhost:8000/path/to/uploaded/profile_picture.jpg',
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Future<void> fetchArtsDataFromServer() async {
     try {
@@ -101,9 +97,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
           children: [
             DrawerHeader(
               decoration: BoxDecoration(color: Colors.blue),
-              child: profilePictureUrl != null
+              child: widget.profilePictureUrl != null
                   ? Image.network(
-                      'http://localhost:8000/$profilePictureUrl',
+                      widget.profilePictureUrl!,
                       fit: BoxFit.cover,
                     )
                   : Icon(Icons.person, size: 100),
@@ -125,11 +121,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProfilePictureUploaderWidget(
-                      onPictureSelected: (File imageFile) {
-                        // Handle the selected profile picture here (e.g., upload to server)
-                      },
-                    ),
+                    builder: (context) => ProfilePictureWidget(userId: widget.userId),
                   ),
                 );
               },

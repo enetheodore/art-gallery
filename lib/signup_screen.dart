@@ -67,29 +67,41 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> uploadProfilePicture(String userId) async {
-    try {
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse('http://127.0.0.1:8000/api/upload_profile_picture'),
-      );
-      request.fields['userId'] = userId;
-      request.files.add(await http.MultipartFile.fromPath(
-          'profile_picture', _profileImage!.path));
+  try {
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse('http://127.0.0.1:8000/api/upload_profile_picture'),
+    );
+    request.fields['userId'] = userId;
+    request.files.add(await http.MultipartFile.fromPath(
+        'profile_picture', _profileImage!.path));
 
-      var response = await request.send();
+    var response = await request.send();
 
-      if (response.statusCode == 200) {
-        print('Profile picture uploaded successfully');
+    if (response.statusCode == 200) {
+      // Read response data as a string
+      String responseBody = await response.stream.bytesToString();
+      // Parse JSON response
+      Map<String, dynamic> parsedResponse = jsonDecode(responseBody);
+      
+      // Check if there's a profile picture URL in the response
+      if (parsedResponse.containsKey('profilePictureUrl')) {
+        String profilePictureUrl = parsedResponse['profilePictureUrl'];
+        print('Profile picture uploaded successfully. URL: $profilePictureUrl');
       } else {
-        print('Failed to upload profile picture: ${response.reasonPhrase}');
-        response.stream.transform(utf8.decoder).listen((value) {
-          print('Server response: $value');
-        });
+        print('Profile picture uploaded, but no URL received');
       }
-    } catch (error) {
-      print('Upload error: $error');
+    } else {
+      print('Failed to upload profile picture: ${response.reasonPhrase}');
+      response.stream.transform(utf8.decoder).listen((value) {
+        print('Server response: $value');
+      });
     }
+  } catch (error) {
+    print('Upload error: $error');
   }
+}
+
 
   void showErrorDialog(BuildContext context, String message) {
     showDialog(

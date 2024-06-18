@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'package:art_gallery_app/gallery_screen.dart';
-import 'package:art_gallery_app/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'gallery_screen.dart';
+import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -35,37 +35,38 @@ class _LoginScreenState extends State<LoginScreen> {
       print("Response details: ${response.toString()}");
       print("statusCode: ${response.statusCode}");
       print("headers: ${response.headers}");
+
       if (statusCode >= 400) {
         String errorResponse = response.body;
         print("Error response: $errorResponse");
       }
 
       if (response.statusCode == 200) {
-        // Successful login, navigate to the gallery screen
         final Map<String, dynamic> responseData = json.decode(response.body);
-        final String? userId = responseData['email'];
+        final int? userId = responseData['user']['id'];
+        final String? profilePicture = responseData['user']['profile_picture'];
+
         if (userId != null) {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => GalleryScreen(userId: userId)),
+              builder: (context) => GalleryScreen(
+                userId: userId,
+                profilePictureUrl: profilePicture,
+              ),
+            ),
           );
         } else {
-          // Handle unexpected null userEmail scenario
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => GalleryScreen(userId: '')),
-          );
+          setState(() {
+            message = 'Error retrieving user information.';
+          });
         }
       } else {
-        // Handle login failure
         setState(() {
           message = 'Failed to login. Please try again.';
         });
       }
     } catch (error) {
-      // Handle network errors
       setState(() {
         message = 'Network error. Please check your connection.';
       });
@@ -81,16 +82,15 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color.fromARGB(255, 0, 51, 102).withOpacity(0.5), // Dark blue
+                Color.fromARGB(255, 0, 51, 102).withOpacity(0.5),
                 Colors.transparent,
                 Colors.transparent,
-                Color.fromARGB(255, 0, 51, 102).withOpacity(0.5), // Dark blue
+                Color.fromARGB(255, 0, 51, 102).withOpacity(0.5),
               ],
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.blue
-                    .withOpacity(0.2), // Adjust the shadow color here
+                color: Colors.blue.withOpacity(0.2),
                 blurRadius: 5.0,
                 spreadRadius: 1.0,
                 offset: Offset(0, 3),
@@ -106,7 +106,6 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text('Login'),
           ],
@@ -125,51 +124,54 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Card(
                     color: Colors.white.withOpacity(0.7),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        TextField(
-                          controller: emailController,
-                          decoration: InputDecoration(labelText: 'Email'),
-                          keyboardType: TextInputType.emailAddress,
-                        ),
-                        TextField(
-                          controller: passwordController,
-                          decoration: InputDecoration(labelText: 'Password'),
-                          obscureText: true,
-                        ),
-                        SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () => login(context),
-                          child: Text('Login'),
-                        ),
-                        SizedBox(height: 10),
-                        if (message.isNotEmpty)
-                          Text(
-                            message,
-                            style: TextStyle(color: Colors.red),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextField(
+                            controller: emailController,
+                            decoration: InputDecoration(labelText: 'Email'),
+                            keyboardType: TextInputType.emailAddress,
                           ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('Do not have an account?'),
-                            TextButton(
+                          TextField(
+                            controller: passwordController,
+                            decoration: InputDecoration(labelText: 'Password'),
+                            obscureText: true,
+                          ),
+                          SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: () => login(context),
+                            child: Text('Login'),
+                          ),
+                          SizedBox(height: 10),
+                          if (message.isNotEmpty)
+                            Text(
+                              message,
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('Do not have an account?'),
+                              TextButton(
                                 onPressed: () {
                                   Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => SignupScreen(),
-                                      ));
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => SignupScreen(),
+                                    ),
+                                  );
                                 },
-                                child: Text('Signup')),
-                          ],
-                        ),
-                      ],
+                                child: Text('Signup'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
