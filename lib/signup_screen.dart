@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:art_gallery_app/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'login_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   @override
@@ -48,9 +48,9 @@ class _SignupScreenState extends State<SignupScreen> {
       );
 
       if (response.statusCode == 201) {
-        final userId = jsonDecode(response.body)['user']['id'];
+        final userEmail = jsonDecode(response.body)['user']['email'];
         if (_profileImage != null) {
-          await uploadProfilePicture(userId);
+          await uploadProfilePicture(userEmail);
         }
         Navigator.push(
           context,
@@ -58,53 +58,21 @@ class _SignupScreenState extends State<SignupScreen> {
         );
       } else {
         print('Failed to sign up. Response body: ${response.body}');
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Error'),
-              content: Text('Failed to sign up. Please try again.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+        showErrorDialog(context, 'Failed to sign up. Please try again.');
       }
     } catch (error) {
       print('Sign up error: $error');
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text('Network error. Please check your connection.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+      showErrorDialog(context, 'Network error. Please check your connection.');
     }
   }
 
-  Future<void> uploadProfilePicture(int userId) async {
+  Future<void> uploadProfilePicture(String userEmail) async {
     try {
       var request = http.MultipartRequest(
         'POST',
         Uri.parse('http://127.0.0.1:8000/api/upload_profile_picture'),
       );
-      request.fields['userId'] = userId.toString();
+      request.fields['userEmail'] = userEmail;
       request.files.add(await http.MultipartFile.fromPath(
           'profile_picture', _profileImage!.path));
 
@@ -123,6 +91,26 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
+  void showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,69 +120,66 @@ class _SignupScreenState extends State<SignupScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
-          child: Stack(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Column(
+              GestureDetector(
+                onTap: pickProfileImage,
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundImage: _profileImage != null
+                      ? FileImage(
+                          _profileImage!) // Explicitly convert File to FileImage
+                      : AssetImage('assets/images/placeholder.png')
+                          as ImageProvider, // Cast AssetImage as ImageProvider
+                  child: _profileImage == null
+                      ? Icon(Icons.camera_alt, size: 50)
+                      : null,
+                ),
+              ),
+              TextField(
+                controller: usernameController,
+                decoration: InputDecoration(labelText: 'Username'),
+              ),
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(labelText: 'Email'),
+                keyboardType: TextInputType.emailAddress,
+              ),
+              TextField(
+                controller: passwordController,
+                decoration: InputDecoration(labelText: 'Password'),
+                obscureText: true,
+              ),
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  GestureDetector(
-                    onTap: pickProfileImage,
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage: _profileImage != null
-                          ? FileImage(_profileImage!)
-                          : AssetImage('assets/images/placeholder.png')
-                              as ImageProvider,
-                      child: _profileImage == null
-                          ? Icon(Icons.camera_alt, size: 50)
-                          : null,
-                    ),
+                  Radio<String>(
+                    value: 'seller',
+                    groupValue: selectedRole,
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedRole = value;
+                      });
+                    },
                   ),
-                  TextField(
-                    controller: usernameController,
-                    decoration: InputDecoration(labelText: 'Username'),
+                  Text('Seller'),
+                  Radio<String>(
+                    value: 'buyer',
+                    groupValue: selectedRole,
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedRole = value;
+                      });
+                    },
                   ),
-                  TextField(
-                    controller: emailController,
-                    decoration: InputDecoration(labelText: 'Email'),
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  TextField(
-                    controller: passwordController,
-                    decoration: InputDecoration(labelText: 'Password'),
-                    obscureText: true,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Radio<String>(
-                        value: 'seller',
-                        groupValue: selectedRole,
-                        onChanged: (String? value) {
-                          setState(() {
-                            selectedRole = value;
-                          });
-                        },
-                      ),
-                      Text('seller'),
-                      Radio<String>(
-                        value: 'buyer',
-                        groupValue: selectedRole,
-                        onChanged: (String? value) {
-                          setState(() {
-                            selectedRole = value;
-                          });
-                        },
-                      ),
-                      Text('buyer'),
-                    ],
-                  ),
-                  ElevatedButton(
-                    onPressed: () => signUp(context),
-                    child: Text('Sign Up'),
-                  ),
+                  Text('Buyer'),
                 ],
+              ),
+              ElevatedButton(
+                onPressed: () => signUp(context),
+                child: Text('Sign Up'),
               ),
             ],
           ),

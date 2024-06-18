@@ -15,7 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String message = '';
 
   Future<void> login(BuildContext context) async {
-    final String baseUrl = 'http://127.0.0.1:8000/api/login';
+    final String baseUrl = 'http://127.0.0.1:8000/api/login1';
     final String email = emailController.text.trim();
     final String password = passwordController.text;
 
@@ -42,10 +42,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (response.statusCode == 200) {
         // Successful login, navigate to the gallery screen
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => GalleryScreen()),
-        );
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        final String? userEmail = responseData['email'];
+        if (userEmail != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => GalleryScreen(userEmail: userEmail)),
+          );
+        } else {
+          // Handle unexpected null userEmail scenario
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => GalleryScreen(userEmail: '')),
+          );
+        }
       } else {
         // Handle login failure
         setState(() {
@@ -96,7 +108,6 @@ class _LoginScreenState extends State<LoginScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            
             Text('Login'),
           ],
         ),
