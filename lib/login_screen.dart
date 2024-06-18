@@ -43,19 +43,19 @@ class _LoginScreenState extends State<LoginScreen> {
       if (response.statusCode == 200) {
         // Successful login, navigate to the gallery screen
         final Map<String, dynamic> responseData = json.decode(response.body);
-        final String? userEmail = responseData['email'];
-        if (userEmail != null) {
+        final String? userId = responseData['email'];
+        if (userId != null) {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => GalleryScreen(userEmail: userEmail)),
+                builder: (context) => GalleryScreen(userId: userId)),
           );
         } else {
           // Handle unexpected null userEmail scenario
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => GalleryScreen(userEmail: '')),
+                builder: (context) => GalleryScreen(userId: '')),
           );
         }
       } else {

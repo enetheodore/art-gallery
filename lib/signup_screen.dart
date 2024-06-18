@@ -48,9 +48,9 @@ class _SignupScreenState extends State<SignupScreen> {
       );
 
       if (response.statusCode == 201) {
-        final userEmail = jsonDecode(response.body)['user']['email'];
+        final userId = jsonDecode(response.body)['user']['email'];
         if (_profileImage != null) {
-          await uploadProfilePicture(userEmail);
+          await uploadProfilePicture(userId);
         }
         Navigator.push(
           context,
@@ -66,13 +66,13 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  Future<void> uploadProfilePicture(String userEmail) async {
+  Future<void> uploadProfilePicture(String userId) async {
     try {
       var request = http.MultipartRequest(
         'POST',
         Uri.parse('http://127.0.0.1:8000/api/upload_profile_picture'),
       );
-      request.fields['userEmail'] = userEmail;
+      request.fields['userId'] = userId;
       request.files.add(await http.MultipartFile.fromPath(
           'profile_picture', _profileImage!.path));
 

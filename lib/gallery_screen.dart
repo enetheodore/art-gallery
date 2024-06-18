@@ -9,8 +9,8 @@ import 'selling_art_screen.dart';
 import 'profilePic.dart'; // Assuming you have this file for profile picture upload functionality
 
 class GalleryScreen extends StatefulWidget {
-  final String userEmail;
-  GalleryScreen({required this.userEmail});
+  final String userId;
+  GalleryScreen({required this.userId});
 
   @override
   _GalleryScreenState createState() => _GalleryScreenState();
@@ -30,9 +30,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
   Future<void> fetchProfilePicFromServer() async {
     try {
-      final userEmail = widget.userEmail;
+      final userId = widget.userId;
       final response = await http.get(
-          Uri.parse('http://127.0.0.1:8000/api/profile_picture/$userEmail'));
+          Uri.parse('http://127.0.0.1:8000/api/profile_picture/$userId'));
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -40,7 +40,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
           profilePictureUrl = responseData['profile_picture'];
         });
       } else if (response.statusCode == 404) {
-        print('Profile picture not found for user with email: $userEmail');
+        print('Profile picture not found for user with email: $userId');
       } else {
         print(
             'Failed to fetch profile picture. Status code: ${response.statusCode}');
