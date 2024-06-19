@@ -4,10 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
-void main() {
-  runApp(SellingArtScreen());
-}
-
 class SellingArtScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -22,19 +18,16 @@ class SellingArtScreen extends StatelessWidget {
 }
 
 class UploadScreen extends StatefulWidget {
-  
   @override
   _UploadScreenState createState() => _UploadScreenState();
 }
 
 class _UploadScreenState extends State<UploadScreen> {
-  
   File? _image;
   final picker = ImagePicker();
   TextEditingController _descriptionController = TextEditingController();
-  
-    late final int userId;
 
+  late final int userId;
 
   Future getImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -66,9 +59,9 @@ class _UploadScreenState extends State<UploadScreen> {
     if (response.statusCode == 201) {
       print('Image uploaded successfully');
       Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => GalleryScreen(userId: userId)),
-    );
+        context,
+        MaterialPageRoute(builder: (context) => GalleryScreen(userId: 51)),
+      );
     } else {
       print('Failed to upload image');
       // Handle error

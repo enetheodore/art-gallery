@@ -1,12 +1,12 @@
 import 'dart:convert';
-import 'package:art_gallery_app/galleryScreenAdmin.dart';
+import 'package:art_gallery_app/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'art_description_screen.dart';
 import 'buy_screen.dart';
 import 'selling_art_screen.dart';
-
-import 'profilePic.dart';
+import 'galleryScreenAdmin.dart'; // Import your admin screen if needed
+import 'profilePic.dart'; // Import your profile picture widget if needed
 
 class GalleryScreen extends StatefulWidget {
   final int userId;
@@ -21,30 +21,39 @@ class GalleryScreen extends StatefulWidget {
 class _GalleryScreenState extends State<GalleryScreen> {
   List<Map<String, dynamic>> arts = [];
   List<String> imagePaths = [];
-
-  late int userId; // Remove 'late' keyword
+  String? profilePictureUrl;
 
   @override
   void initState() {
     super.initState();
-    userId = widget.userId; // Initialize userId here
+    profilePictureUrl = widget.profilePictureUrl;
     fetchArtsDataFromServer();
-    // WidgetsBinding.instance!.addPostFrameCallback((_) {
-    //   _navigateToGalleryScreen();
-    // });
+    fetchProfilePicture();
   }
 
-  // void _navigateToGalleryScreen() {
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(
-  //       builder: (context) => GalleryScreen(
-  //         userId: widget.userId, // Pass userId from widget, not from state
-  //         profilePictureUrl: 'http://localhost:8000/path/to/uploaded/profile_picture.jpg',
-  //       ),
-  //     ),
-  //   );
-  // }
+  Future<void> fetchProfilePicture() async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://localhost:8000/api/profile_picture/${widget.userId}'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          profilePictureUrl = 'http://localhost:8000${data['profile_picture']}';
+        });
+      } else if (response.statusCode == 404) {
+        setState(() {
+          profilePictureUrl = null;
+        });
+        print('Profile picture not found for userId ${widget.userId}');
+      } else {
+        print('Failed to load profile picture: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching profile picture: $error');
+    }
+  }
 
   Future<void> fetchArtsDataFromServer() async {
     try {
@@ -97,12 +106,12 @@ class _GalleryScreenState extends State<GalleryScreen> {
           children: [
             DrawerHeader(
               decoration: BoxDecoration(color: Colors.blue),
-              child: widget.profilePictureUrl != null
+              child: profilePictureUrl != null
                   ? Image.network(
-                      widget.profilePictureUrl!,
+                      profilePictureUrl!, // Display profile picture if available
                       fit: BoxFit.cover,
                     )
-                  : Icon(Icons.person, size: 100),
+                  : Placeholder(),
             ),
             ListTile(
               leading: Icon(Icons.monetization_on),
@@ -121,7 +130,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProfilePictureWidget(userId: widget.userId),
+                    builder: (context) =>
+                        ProfilePictureWidget(userId: widget.userId),
                   ),
                 );
               },
@@ -131,7 +141,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
               leading: Icon(Icons.exit_to_app),
               title: Text('Logout'),
               onTap: () {
-                // Implement logout functionality
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()));
               },
             ),
           ],
@@ -152,8 +163,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 MaterialPageRoute(
                   builder: (context) => ArtDescriptionScreen(
                     imageUrl: 'http://localhost:8000/${imagePaths[index]}',
-                    title: '',
-                    artist: 'me',
+                    title: arts[index]['title'],
+                    artist: arts[index]['artist'],
                     description: arts[index]['description'],
                   ),
                 ),
