@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:art_gallery_app/galleryScreenAdmin.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'gallery_screen.dart';
@@ -13,6 +14,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   String message = '';
+  String? selectedRole;
 
   Future<void> login(BuildContext context) async {
     final String baseUrl = 'http://127.0.0.1:8000/api/login1';
@@ -45,17 +47,31 @@ class _LoginScreenState extends State<LoginScreen> {
         final Map<String, dynamic> responseData = json.decode(response.body);
         final int? userId = responseData['user']['id'];
         final String? profilePicture = responseData['user']['profile_picture'];
+        final String? role = responseData['user']['role'];
 
-        if (userId != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => GalleryScreen(
-                userId: userId,
-                profilePictureUrl: profilePicture,
+        if (userId != null && role != null) {
+          if (role == 'seller') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => GalleryScreenAdmin(),
               ),
-            ),
-          );
+            );
+          } else if (role == 'buyer') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => GalleryScreen(
+                  userId: userId,
+                  profilePictureUrl: profilePicture,
+                ),
+              ),
+            );
+          } else {
+            setState(() {
+              message = 'Unknown user role.';
+            });
+          }
         } else {
           setState(() {
             message = 'Error retrieving user information.';

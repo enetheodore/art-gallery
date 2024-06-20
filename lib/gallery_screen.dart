@@ -106,9 +106,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
       ),
       drawer: Drawer(
         child: Container(
-          decoration: BoxDecoration(
-            color: Colors.blueGrey
-          ),
+          decoration: BoxDecoration(color: Colors.blueGrey.withOpacity(0.7)),
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
@@ -123,7 +121,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
               ),
               ListTile(
                 leading: Icon(Icons.monetization_on),
-                title: Text('Sell Art'),
+                title: Text(
+                  'Sell Art',
+                  selectionColor: Colors.white,
+                ),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -133,7 +134,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
               ),
               ListTile(
                 leading: Icon(Icons.person),
-                title: Text('Profile'),
+                title: Text(
+                  'Profile',
+                  selectionColor: Colors.white,
+                ),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -147,7 +151,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
               Divider(),
               ListTile(
                 leading: Icon(Icons.exit_to_app),
-                title: Text('Logout'),
+                title: Text(
+                  'Logout',
+                  selectionColor: Colors.white,
+                ),
                 onTap: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => LoginScreen()));
@@ -158,9 +165,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
         ),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          color: Colors.blueGrey.withOpacity(0.7)
-        ),
+        decoration: BoxDecoration(color: Colors.blueGrey.withOpacity(0.7)),
         child: GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
