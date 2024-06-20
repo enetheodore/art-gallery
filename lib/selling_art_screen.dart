@@ -72,6 +72,8 @@ class _UploadScreenState extends State<UploadScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: true,
+        centerTitle: true,
         title: Text('Upload Art'),
       ),
       body: SingleChildScrollView(

@@ -103,55 +103,64 @@ class _GalleryScreenState extends State<GalleryScreenAdmin> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
+        shadowColor: Colors.black,
+        backgroundColor: Colors.blueGrey,
+        foregroundColor: Colors.white,
         title: Text('Art Gallery Admin'),
       ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 8.0,
-                mainAxisSpacing: 8.0,
+      body: Container(
+        decoration: BoxDecoration(
+          color: Colors.blueGrey.withOpacity(0.7)
+        ),
+        child: isLoading
+            ? Center(child: CircularProgressIndicator())
+            : GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 8.0,
+                  mainAxisSpacing: 8.0,
+                ),
+                itemCount: arts.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ArtDescriptionScreen(
+                            imageUrl: 'http://localhost:8000/${imagePaths[index]}',
+                            title: '',
+                            artist: 'me',
+                            description: arts[index]['description'],
+                          ),
+                        ),
+                      );
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          child: Image.network(
+                            'http://localhost:8000/${imagePaths[index]}',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        SizedBox(height: 8.0),
+                        Text(arts[index]['description']),
+                        SizedBox(height: 8.0),
+                        Center(
+                          child: TextButton(
+                            onPressed: () => deleteArt(index),
+                            child: Text('Delete'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
-              itemCount: arts.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ArtDescriptionScreen(
-                          imageUrl: 'http://localhost:8000/${imagePaths[index]}',
-                          title: '',
-                          artist: 'me',
-                          description: arts[index]['description'],
-                        ),
-                      ),
-                    );
-                  },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: Image.network(
-                          'http://localhost:8000/${imagePaths[index]}',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      SizedBox(height: 8.0),
-                      Text(arts[index]['description']),
-                      SizedBox(height: 8.0),
-                      Center(
-                        child: TextButton(
-                          onPressed: () => deleteArt(index),
-                          child: Text('Delete'),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
