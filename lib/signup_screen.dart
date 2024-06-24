@@ -67,41 +67,41 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> uploadProfilePicture(String userId) async {
-  try {
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse('http://127.0.0.1:8000/api/upload_profile_picture'),
-    );
-    request.fields['userId'] = userId;
-    request.files.add(await http.MultipartFile.fromPath(
-        'profile_picture', _profileImage!.path));
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('http://127.0.0.1:8000/api/upload_profile_picture'),
+      );
+      request.fields['userId'] = userId;
+      request.files.add(await http.MultipartFile.fromPath(
+          'profile_picture', _profileImage!.path));
 
-    var response = await request.send();
+      var response = await request.send();
 
-    if (response.statusCode == 200) {
-      // Read response data as a string
-      String responseBody = await response.stream.bytesToString();
-      // Parse JSON response
-      Map<String, dynamic> parsedResponse = jsonDecode(responseBody);
-      
-      // Check if there's a profile picture URL in the response
-      if (parsedResponse.containsKey('profilePictureUrl')) {
-        String profilePictureUrl = parsedResponse['profilePictureUrl'];
-        print('Profile picture uploaded successfully. URL: $profilePictureUrl');
+      if (response.statusCode == 200) {
+        // Read response data as a string
+        String responseBody = await response.stream.bytesToString();
+        // Parse JSON response
+        Map<String, dynamic> parsedResponse = jsonDecode(responseBody);
+
+        // Check if there's a profile picture URL in the response
+        if (parsedResponse.containsKey('profilePictureUrl')) {
+          String profilePictureUrl = parsedResponse['profilePictureUrl'];
+          print(
+              'Profile picture uploaded successfully. URL: $profilePictureUrl');
+        } else {
+          print('Profile picture uploaded, but no URL received');
+        }
       } else {
-        print('Profile picture uploaded, but no URL received');
+        print('Failed to upload profile picture: ${response.reasonPhrase}');
+        response.stream.transform(utf8.decoder).listen((value) {
+          print('Server response: $value');
+        });
       }
-    } else {
-      print('Failed to upload profile picture: ${response.reasonPhrase}');
-      response.stream.transform(utf8.decoder).listen((value) {
-        print('Server response: $value');
-      });
+    } catch (error) {
+      print('Upload error: $error');
     }
-  } catch (error) {
-    print('Upload error: $error');
   }
-}
-
 
   void showErrorDialog(BuildContext context, String message) {
     showDialog(
@@ -126,73 +126,115 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        centerTitle: true,
-      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(0),
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+          child: Stack(
             children: [
-              GestureDetector(
-                onTap: pickProfileImage,
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundImage: _profileImage != null
-                      ? FileImage(
-                          _profileImage!) // Explicitly convert File to FileImage
-                      : AssetImage('assets/images/placeholder.png')
-                          as ImageProvider, // Cast AssetImage as ImageProvider
-                  child: _profileImage == null
-                      ? Icon(Icons.camera_alt, size: 50)
-                      : null,
-                ),
+              Image.asset(
+                'assets/images/bmw.png',
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                fit: BoxFit.cover,
               ),
-              TextField(
-                controller: usernameController,
-                decoration: InputDecoration(labelText: 'Username'),
-              ),
-              TextField(
-                controller: emailController,
-                decoration: InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-              ),
-              TextField(
-                controller: passwordController,
-                decoration: InputDecoration(labelText: 'Password'),
-                obscureText: true,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Radio<String>(
-                    value: 'seller',
-                    groupValue: selectedRole,
-                    onChanged: (String? value) {
-                      setState(() {
-                        selectedRole = value;
-                      });
-                    },
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.1,
                   ),
-                  Text('Seller'),
-                  Radio<String>(
-                    value: 'buyer',
-                    groupValue: selectedRole,
-                    onChanged: (String? value) {
-                      setState(() {
-                        selectedRole = value;
-                      });
-                    },
+                  GestureDetector(
+                    onTap: pickProfileImage,
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundImage: _profileImage != null
+                          ? FileImage(
+                              _profileImage!) // Explicitly convert File to FileImage
+                          : AssetImage('assets/images/placeholder.png')
+                              as ImageProvider, // Cast AssetImage as ImageProvider
+                      child: _profileImage == null
+                          ? Icon(Icons.camera_alt, size: 50)
+                          : null,
+                    ),
                   ),
-                  Text('Buyer'),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.1,
+                  ),
+                  Card(
+                    color: Colors.white.withOpacity(0.7),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextField(
+                            controller: usernameController,
+                            decoration: InputDecoration(labelText: 'Username'),
+                          ),
+                          TextField(
+                            controller: emailController,
+                            decoration: InputDecoration(labelText: 'Email'),
+                            keyboardType: TextInputType.emailAddress,
+                          ),
+                          TextField(
+                            controller: passwordController,
+                            decoration: InputDecoration(labelText: 'Password'),
+                            obscureText: true,
+                          ),
+                          SizedBox(height: 5,),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Radio<String>(
+                                value: 'seller',
+                                groupValue: selectedRole,
+                                onChanged: (String? value) {
+                                  setState(() {
+                                    selectedRole = value;
+                                  });
+                                },
+                              ),
+                              Text('Seller'),
+                              Radio<String>(
+                                value: 'buyer',
+                                groupValue: selectedRole,
+                                onChanged: (String? value) {
+                                  setState(() {
+                                    selectedRole = value;
+                                  });
+                                },
+                              ),
+                              Text('Buyer'),
+                            ],
+                          ),
+                          SizedBox(height: 5,),
+                          ElevatedButton(
+                            onPressed: () => signUp(context),
+                            child: Text('Sign Up'),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('Already have an account?'),
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => LoginScreen()));
+                                  },
+                                  child: Text(
+                                    'Login',
+                                  )),
+                            ],
+                          ),
+                          SizedBox(height: 5,),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
-              ),
-              ElevatedButton(
-                onPressed: () => signUp(context),
-                child: Text('Sign Up'),
               ),
             ],
           ),
