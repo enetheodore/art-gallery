@@ -22,6 +22,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
   List<Map<String, dynamic>> arts = [];
   List<String> imagePaths = [];
   String? profilePictureUrl;
+  int _selectedIndex = 1;
 
   @override
   void initState() {
@@ -83,6 +84,84 @@ class _GalleryScreenState extends State<GalleryScreen> {
     }
   }
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  Widget _buildPage() {
+    switch (_selectedIndex) {
+      case 0:
+        return SellingArtScreen();
+      case 1:
+        return _buildGallery();
+      case 2:
+        return ProfilePictureWidget(userId: widget.userId);
+      default:
+        return _buildGallery();
+    }
+  }
+
+  Widget _buildGallery() {
+    return Container(
+      decoration: BoxDecoration(color: Colors.blueGrey.withOpacity(0.7)),
+      child: GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 8.0,
+          mainAxisSpacing: 8.0,
+        ),
+        itemCount: arts.length,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ArtDescriptionScreen(
+                    imageUrl: 'http://localhost:8000/${imagePaths[index]}',
+                    title: '',
+                    artist: 'me',
+                    description: arts[index]['description'],
+                  ),
+                ),
+              );
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: Image.network(
+                    'http://localhost:8000/${imagePaths[index]}',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                SizedBox(height: 8.0),
+                Text(
+                  arts[index]['description'],
+                  style: TextStyle(color: Colors.white),
+                ),
+                SizedBox(height: 8.0),
+                Center(
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => BuyScreen()),
+                      );
+                    },
+                    child: Text('Buy'),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,19 +190,33 @@ class _GalleryScreenState extends State<GalleryScreen> {
             padding: EdgeInsets.zero,
             children: [
               DrawerHeader(
-                decoration: BoxDecoration(color: Colors.blue),
+                decoration: BoxDecoration(color: Colors.blueGrey),
                 child: profilePictureUrl != null
-                    ? Image.network(
-                        profilePictureUrl!, // Display profile picture if available
-                        fit: BoxFit.cover,
+                    ? CircleAvatar(
+                        radius: 50,
+                        backgroundImage: NetworkImage(profilePictureUrl!),
                       )
-                    : Placeholder(),
+                    : CircleAvatar(
+                        radius: 50,
+                        child: Icon(Icons.person, size: 50),
+                      ),
               ),
+              ListTile(
+                leading: Icon(Icons.home),
+                title: Text(
+                  'Home',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onTap: () {
+                  Navigator.pop(context); // Close the drawer
+                },
+              ),
+              Divider(),
               ListTile(
                 leading: Icon(Icons.monetization_on),
                 title: Text(
                   'Sell Art',
-                  selectionColor: Colors.white,
+                  style: TextStyle(color: Colors.white),
                 ),
                 onTap: () {
                   Navigator.push(
@@ -136,7 +229,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 leading: Icon(Icons.person),
                 title: Text(
                   'Profile',
-                  selectionColor: Colors.white,
+                  style: TextStyle(color: Colors.white),
                 ),
                 onTap: () {
                   Navigator.push(
@@ -153,7 +246,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 leading: Icon(Icons.exit_to_app),
                 title: Text(
                   'Logout',
-                  selectionColor: Colors.white,
+                  style: TextStyle(color: Colors.white),
                 ),
                 onTap: () {
                   Navigator.push(context,
@@ -164,67 +257,59 @@ class _GalleryScreenState extends State<GalleryScreen> {
           ),
         ),
       ),
-      body: Container(
-        decoration: BoxDecoration(color: Colors.blueGrey.withOpacity(0.7)),
-        child: GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 8.0,
-            mainAxisSpacing: 8.0,
+      body: _buildPage(),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blueGrey, Colors.blueGrey.withOpacity(0.5)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          itemCount: arts.length,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ArtDescriptionScreen(
-                      imageUrl: 'http://localhost:8000/${imagePaths[index]}',
-                      title: '',
-                      artist: 'me',
-                      description: arts[index]['description'],
-                    ),
-                  ),
-                );
-              },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: Image.network(
-                      'http://localhost:8000/${imagePaths[index]}',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  SizedBox(height: 8.0),
-                  Text(arts[index]['description']),
-                  SizedBox(height: 8.0),
-                  Center(
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => BuyScreen()),
-                        );
-                      },
-                      child: Text('Buy'),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black38,
+              blurRadius: 10,
+              offset: Offset(0, -2),
+            ),
+          ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => SellingArtScreen()),
-          );
-        },
-        child: Icon(Icons.monetization_on),
+        child: ClipRRect(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+          child: BottomNavigationBar(
+            items: [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.monetization_on),
+                label: 'Sell Art',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person),
+                label: 'Profile',
+              ),
+            ],
+            currentIndex: _selectedIndex,
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.white70,
+            backgroundColor: Colors.transparent,
+            onTap: _onItemTapped,
+            showSelectedLabels: true,
+            showUnselectedLabels: true,
+            selectedFontSize: 14,
+            unselectedFontSize: 12,
+            type: BottomNavigationBarType.fixed,
+            elevation: 0,
+          ),
+        ),
       ),
     );
   }
