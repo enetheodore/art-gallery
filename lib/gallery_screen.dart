@@ -144,7 +144,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 ),
                 SizedBox(height: 8.0),
                 Center(
-                  child: TextButton(
+                  child: ElevatedButton(
                     onPressed: () {
                       Navigator.push(
                         context,

@@ -72,7 +72,9 @@ class _UploadScreenState extends State<UploadScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: true,
+        shadowColor: Colors.black,
+        backgroundColor: Colors.blueGrey,
+        foregroundColor: Colors.white,
         centerTitle: true,
         title: Text('Upload Art'),
       ),
