@@ -140,18 +140,25 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 SizedBox(height: 8.0),
                 Text(
                   arts[index]['description'],
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.black),
                 ),
                 SizedBox(height: 8.0),
                 Center(
                   child: ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(Colors.blueGrey),
+                      shadowColor: WidgetStatePropertyAll(Colors.black),
+                    ),
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => BuyScreen()),
                       );
                     },
-                    child: Text('Buy'),
+                    child: Text(
+                      'Buy',
+                      style: TextStyle(color: Colors.black),
+                    ),
                   ),
                 ),
               ],
@@ -169,7 +176,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
         centerTitle: true,
         shadowColor: Colors.black,
         backgroundColor: Colors.blueGrey,
-        foregroundColor: Colors.white,
+        foregroundColor: Colors.black,
         title: Text('Art Gallery'),
         actions: [
           IconButton(
@@ -205,7 +212,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 leading: Icon(Icons.home),
                 title: Text(
                   'Home',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.black),
                 ),
                 onTap: () {
                   Navigator.pop(context); // Close the drawer
@@ -216,7 +223,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 leading: Icon(Icons.monetization_on),
                 title: Text(
                   'Sell Art',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.black),
                 ),
                 onTap: () {
                   Navigator.push(
@@ -229,7 +236,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 leading: Icon(Icons.person),
                 title: Text(
                   'Profile',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.black),
                 ),
                 onTap: () {
                   Navigator.push(
@@ -246,7 +253,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 leading: Icon(Icons.exit_to_app),
                 title: Text(
                   'Logout',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.black),
                 ),
                 onTap: () {
                   Navigator.push(context,
@@ -298,8 +305,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
               ),
             ],
             currentIndex: _selectedIndex,
-            selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.white70,
+            selectedItemColor: Colors.black,
+            unselectedItemColor: Colors.black.withOpacity(0.5),
             backgroundColor: Colors.transparent,
             onTap: _onItemTapped,
             showSelectedLabels: true,
