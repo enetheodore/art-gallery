@@ -146,8 +146,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 Center(
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(Colors.blueGrey),
-                      shadowColor: WidgetStatePropertyAll(Colors.black),
+                      backgroundColor: MaterialStateProperty.all(Colors.blueGrey),
+                      shadowColor: MaterialStateProperty.all(Colors.black),
                     ),
                     onPressed: () {
                       Navigator.push(

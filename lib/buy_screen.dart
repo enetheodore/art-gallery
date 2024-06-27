@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
-class BuyScreen extends StatelessWidget {
+class BuyScreen extends StatefulWidget {
+  @override
+  State<BuyScreen> createState() => _BuyScreenState();
+}
+
+class _BuyScreenState extends State<BuyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

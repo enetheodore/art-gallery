@@ -5,19 +5,29 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
 class SellingArtScreen extends StatelessWidget {
+  const SellingArtScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Art Upload',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        textTheme: const TextTheme(
+          headlineLarge: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+          //headline6: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
+          bodyMedium: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
+        ),
       ),
-      home: UploadScreen(),
+      home: const UploadScreen(),
     );
   }
 }
 
 class UploadScreen extends StatefulWidget {
+  const UploadScreen({Key? key}) : super(key: key);
+
   @override
   _UploadScreenState createState() => _UploadScreenState();
 }
@@ -25,11 +35,10 @@ class UploadScreen extends StatefulWidget {
 class _UploadScreenState extends State<UploadScreen> {
   File? _image;
   final picker = ImagePicker();
-  TextEditingController _descriptionController = TextEditingController();
-
+  final TextEditingController _descriptionController = TextEditingController();
   late final int userId;
 
-  Future getImage() async {
+  Future<void> getImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     setState(() {
@@ -76,43 +85,76 @@ class _UploadScreenState extends State<UploadScreen> {
         backgroundColor: Colors.blueGrey,
         foregroundColor: Colors.white,
         centerTitle: true,
-        title: Text('Upload Art'),
+        title: const Text('Upload Art'),
       ),
       body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _image != null
-                ? Image.file(
-                    _image!,
-                    height: 200,
-                    width: 200,
-                    fit: BoxFit.cover,
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(10.0),
+                    child: Image.file(
+                      _image!,
+                      height: 200,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
                   )
-                : Placeholder(
-                    fallbackHeight: 200,
-                    fallbackWidth: 200,
+                : Container(
+                    height: 200,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: Icon(
+                      Icons.image,
+                      color: Colors.grey[800],
+                      size: 100,
+                    ),
                   ),
-            SizedBox(height: 20),
-            ElevatedButton(
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
               onPressed: getImage,
-              child: Text('Select Image'),
+              icon: const Icon(Icons.photo_library),
+              label: const Text('Select Image'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueGrey,
+                foregroundColor: Colors.white,
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
+              ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: TextField(
                 controller: _descriptionController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Description',
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 4,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _image != null ? uploadImage : null,
-              child: Text('Upload Art'),
+              child: const Text('Upload Art'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                foregroundColor: Colors.white,
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
+              ),
             ),
           ],
         ),
