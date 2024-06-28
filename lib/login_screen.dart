@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:art_gallery_app/buildPage.dart';
 import 'package:art_gallery_app/galleryScreenAdmin.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -15,6 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
   String message = '';
   String? selectedRole;
+  int index = 0;
 
   Future<void> login(BuildContext context) async {
     final String baseUrl = 'http://127.0.0.1:8000/api/login1';
@@ -61,10 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => GalleryScreen(
-                  userId: userId,
-                  profilePictureUrl: profilePicture,
-                ),
+                builder: (context) => BottomPage(userId: userId),
               ),
             );
           } else {

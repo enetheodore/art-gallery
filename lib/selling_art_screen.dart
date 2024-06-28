@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:art_gallery_app/buildPage.dart';
 import 'package:art_gallery_app/gallery_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -11,6 +12,7 @@ class SellingArtScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Art Upload',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -36,7 +38,7 @@ class _UploadScreenState extends State<UploadScreen> {
   File? _image;
   final picker = ImagePicker();
   final TextEditingController _descriptionController = TextEditingController();
-  late final int userId;
+  
 
   Future<void> getImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -69,7 +71,7 @@ class _UploadScreenState extends State<UploadScreen> {
       print('Image uploaded successfully');
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => GalleryScreen(userId: 51)),
+        MaterialPageRoute(builder: (context) => BottomPage(userId: 0)),
       );
     } else {
       print('Failed to upload image');
@@ -81,6 +83,7 @@ class _UploadScreenState extends State<UploadScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: true,
         shadowColor: Colors.black,
         backgroundColor: Colors.blueGrey,
         foregroundColor: Colors.white,

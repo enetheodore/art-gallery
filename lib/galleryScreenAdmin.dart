@@ -166,7 +166,7 @@ class _GalleryScreenState extends State<GalleryScreenAdmin> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => SellingArtScreen(),
+              builder: (context) => UploadScreen(),
             ),
           );
         },

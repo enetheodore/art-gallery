@@ -4,7 +4,7 @@ import 'package:art_gallery_app/selling_art_screen.dart';
 import 'package:flutter/material.dart';
 
 class BottomPage extends StatefulWidget {
-  final String userId;
+  final int userId;
 
   BottomPage({required this.userId});
 
@@ -13,7 +13,7 @@ class BottomPage extends StatefulWidget {
 }
 
 class BottomPageState extends State<BottomPage> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -24,9 +24,9 @@ class BottomPageState extends State<BottomPage> {
   Widget _buildPage() {
     switch (_selectedIndex) {
       case 0:
-        return SellingArtScreen();
+        return UploadScreen();
       case 1:
-        return GalleryScreenAdmin();
+        return GalleryScreen(userId: 0);
       default:
         return GalleryScreen(userId: 0);
     }
@@ -35,6 +35,7 @@ class BottomPageState extends State<BottomPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      body: _buildPage(),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
