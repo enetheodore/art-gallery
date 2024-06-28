@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:art_gallery_app/buildPage.dart';
 import 'package:art_gallery_app/gallery_screen.dart';
 import 'package:art_gallery_app/login_screen.dart';
 import 'package:art_gallery_app/signup_screen.dart';
@@ -17,7 +18,7 @@ class ArtGalleryApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'My App',
-      home: LoginScreen(),
+      home: BottomPage(userId: 0),
       debugShowCheckedModeBanner: false,
     );
   }

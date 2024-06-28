@@ -86,7 +86,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
   Widget _buildGallery() {
     return Container(
-      decoration: BoxDecoration(color: Colors.blueGrey.withOpacity(0.7)),
+      decoration: BoxDecoration(color: Colors.black26.withOpacity(0.2)),
       child: GridView.builder(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
@@ -109,21 +109,56 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 ),
               );
             },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            child: ListView(
+              padding: EdgeInsets.all(10.0),
               children: [
-                Expanded(
-                  child: Image.network(
-                    'http://localhost:8000/${imagePaths[index]}',
-                    fit: BoxFit.cover,
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.blueGrey,
+                        Colors.blueGrey.withOpacity(0.5)
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      bottomLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Container(
+                    height: MediaQuery.of(context).size.height * 0.2,
+                    width: MediaQuery.of(context).size.height * 0.2,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        bottomLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                        bottomRight: Radius.circular(20),
+                      ),
+                      child: Image.network(
+                        'http://localhost:8000/${imagePaths[index]}',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                 ),
-                SizedBox(height: 8.0),
+                SizedBox(height: 5.0),
                 Text(
                   arts[index]['description'],
                   style: TextStyle(color: Colors.black),
                 ),
-                SizedBox(height: 8.0),
+                SizedBox(height: 3.0),
                 Center(
                   child: ElevatedButton(
                     style: ButtonStyle(
@@ -154,23 +189,57 @@ class _GalleryScreenState extends State<GalleryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        shadowColor: Colors.black,
-        backgroundColor: Colors.blueGrey,
-        foregroundColor: Colors.black,
-        title: Text('Art Gallery'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => GalleryScreenAdmin()),
-              );
-            },
-            icon: Icon(Icons.admin_panel_settings),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.blueGrey, Colors.blueGrey.withOpacity(0.5)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              bottomLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+              bottomRight: Radius.circular(20),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black38,
+                blurRadius: 10,
+                offset: Offset(0, 5),
+              ),
+            ],
           ),
-        ],
+          child: AppBar(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                bottomLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+              ),
+            ),
+            centerTitle: true,
+            backgroundColor:
+                Colors.transparent, // Make AppBar background transparent
+            elevation: 0, // Remove AppBar's own shadow
+            title: Text('Art Gallery'),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => GalleryScreenAdmin()),
+                  );
+                },
+                icon: Icon(Icons.admin_panel_settings),
+              ),
+            ],
+          ),
+        ),
       ),
       drawer: Drawer(
         child: Container(
@@ -200,7 +269,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   Navigator.pop(context); // Close the drawer
                 },
               ),
-              Divider(),
               ListTile(
                 leading: Icon(Icons.monetization_on),
                 title: Text(
@@ -230,7 +298,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   );
                 },
               ),
-              Divider(),
               ListTile(
                 leading: Icon(Icons.exit_to_app),
                 title: Text(
