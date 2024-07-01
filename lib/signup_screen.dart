@@ -79,12 +79,9 @@ class _SignupScreenState extends State<SignupScreen> {
       var response = await request.send();
 
       if (response.statusCode == 200) {
-        // Read response data as a string
         String responseBody = await response.stream.bytesToString();
-        // Parse JSON response
         Map<String, dynamic> parsedResponse = jsonDecode(responseBody);
 
-        // Check if there's a profile picture URL in the response
         if (parsedResponse.containsKey('profilePictureUrl')) {
           String profilePictureUrl = parsedResponse['profilePictureUrl'];
           print(
@@ -131,110 +128,162 @@ class _SignupScreenState extends State<SignupScreen> {
         child: Center(
           child: Stack(
             children: [
-              Image.asset(
-                'assets/images/bmw.png',
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width,
-                fit: BoxFit.cover,
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.blueGrey, Colors.black],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.1,
-                  ),
-                  GestureDetector(
-                    onTap: pickProfileImage,
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage: _profileImage != null
-                          ? FileImage(
-                              _profileImage!) // Explicitly convert File to FileImage
-                          : AssetImage('assets/images/placeholder.png')
-                              as ImageProvider, // Cast AssetImage as ImageProvider
-                      child: _profileImage == null
-                          ? Icon(Icons.camera_alt, size: 50)
-                          : null,
+              SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+                    Text(
+                      'Create Account',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.1,
-                  ),
-                  Card(
-                    color: Colors.white.withOpacity(0.7),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          TextField(
-                            controller: usernameController,
-                            decoration: InputDecoration(labelText: 'Username'),
-                          ),
-                          TextField(
-                            controller: emailController,
-                            decoration: InputDecoration(labelText: 'Email'),
-                            keyboardType: TextInputType.emailAddress,
-                          ),
-                          TextField(
-                            controller: passwordController,
-                            decoration: InputDecoration(labelText: 'Password'),
-                            obscureText: true,
-                          ),
-                          SizedBox(height: 5,),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Radio<String>(
-                                value: 'seller',
-                                groupValue: selectedRole,
-                                onChanged: (String? value) {
-                                  setState(() {
-                                    selectedRole = value;
-                                  });
-                                },
+                    SizedBox(height: 20),
+                    GestureDetector(
+                      onTap: pickProfileImage,
+                      child: CircleAvatar(
+                        radius: 50,
+                        backgroundColor: Colors.grey.withOpacity(0.5),
+                        backgroundImage: _profileImage != null
+                            ? FileImage(_profileImage!)
+                            : AssetImage('assets/images/placeholder.png')
+                                as ImageProvider,
+                        child: _profileImage == null
+                            ? Icon(Icons.camera_alt,
+                                size: 50, color: Colors.white)
+                            : null,
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    Card(
+                      color: Colors.white.withOpacity(0.8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextField(
+                              controller: usernameController,
+                              decoration: InputDecoration(
+                                labelText: 'Username',
+                                labelStyle: TextStyle(color: Colors.blueGrey),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.blueGrey),
+                                ),
                               ),
-                              Text('Seller'),
-                              Radio<String>(
-                                value: 'buyer',
-                                groupValue: selectedRole,
-                                onChanged: (String? value) {
-                                  setState(() {
-                                    selectedRole = value;
-                                  });
-                                },
+                            ),
+                            TextField(
+                              controller: emailController,
+                              decoration: InputDecoration(
+                                labelText: 'Email',
+                                labelStyle: TextStyle(color: Colors.blueGrey),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.blueGrey),
+                                ),
                               ),
-                              Text('Buyer'),
-                            ],
-                          ),
-                          SizedBox(height: 5,),
-                          ElevatedButton(
-                            onPressed: () => signUp(context),
-                            child: Text('Sign Up'),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('Already have an account?'),
-                              TextButton(
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+                            TextField(
+                              controller: passwordController,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                labelStyle: TextStyle(color: Colors.blueGrey),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.blueGrey),
+                                ),
+                              ),
+                              obscureText: true,
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Radio<String>(
+                                  value: 'seller',
+                                  groupValue: selectedRole,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      selectedRole = value;
+                                    });
+                                  },
+                                ),
+                                Text('Seller'),
+                                Radio<String>(
+                                  value: 'buyer',
+                                  groupValue: selectedRole,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      selectedRole = value;
+                                    });
+                                  },
+                                ),
+                                Text('Buyer'),
+                              ],
+                            ),
+                            SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: () => signUp(context),
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.blueGrey,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 50, vertical: 15),
+                              ),
+                              child: Text(
+                                'Sign Up',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('Already have an account?'),
+                                TextButton(
                                   onPressed: () {
                                     Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => LoginScreen()));
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => LoginScreen(),
+                                      ),
+                                    );
                                   },
                                   child: Text(
                                     'Login',
-                                  )),
-                            ],
-                          ),
-                          SizedBox(height: 5,),
-                        ],
+                                    style: TextStyle(
+                                      color: Colors.blueGrey,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
@@ -242,4 +291,10 @@ class _SignupScreenState extends State<SignupScreen> {
       ),
     );
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: SignupScreen(),
+  ));
 }

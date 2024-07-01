@@ -3,6 +3,7 @@ import 'package:art_gallery_app/buildPage.dart';
 import 'package:art_gallery_app/gallery_screen.dart';
 import 'package:art_gallery_app/login_screen.dart';
 import 'package:art_gallery_app/signup_screen.dart';
+import 'package:art_gallery_app/welcomeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -18,7 +19,7 @@ class ArtGalleryApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'My App',
-      home: BottomPage(userId: 0),
+      home: WelcomeScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

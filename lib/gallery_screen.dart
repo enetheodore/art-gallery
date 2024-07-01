@@ -1,12 +1,12 @@
 import 'dart:convert';
-import 'package:art_gallery_app/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'login_screen.dart';
 import 'art_description_screen.dart';
 import 'buy_screen.dart';
 import 'selling_art_screen.dart';
-import 'galleryScreenAdmin.dart'; // Import your admin screen if needed
-import 'profilePic.dart'; // Import your profile picture widget if needed
+import 'galleryScreenAdmin.dart';
+import 'profilePic.dart';
 
 class GalleryScreen extends StatefulWidget {
   final int userId;
@@ -23,6 +23,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
   List<String> imagePaths = [];
   String? profilePictureUrl;
   int _selectedIndex = 1;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -84,14 +85,38 @@ class _GalleryScreenState extends State<GalleryScreen> {
     }
   }
 
+  void _searchArts(String query) {
+    final filteredArts = arts.where((art) {
+      final descriptionLower = art['description'].toLowerCase();
+      final searchLower = query.toLowerCase();
+      return descriptionLower.contains(searchLower);
+    }).toList();
+
+    setState(() {
+      arts = filteredArts;
+    });
+  }
+
   Widget _buildGallery() {
     return Container(
-      decoration: BoxDecoration(color: Colors.black26.withOpacity(0.2)),
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.9),
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
       child: GridView.builder(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           crossAxisSpacing: 8.0,
           mainAxisSpacing: 8.0,
+          childAspectRatio: 0.8,
         ),
         itemCount: arts.length,
         itemBuilder: (context, index) {
@@ -109,76 +134,47 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 ),
               );
             },
-            child: ListView(
-              padding: EdgeInsets.all(10.0),
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.blueGrey,
-                        Colors.blueGrey.withOpacity(0.5)
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      bottomLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
-                      bottomRight: Radius.circular(20),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black38,
-                        blurRadius: 10,
-                        offset: Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Container(
-                    height: MediaQuery.of(context).size.height * 0.2,
-                    width: MediaQuery.of(context).size.height * 0.2,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        bottomLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
-                        bottomRight: Radius.circular(20),
-                      ),
-                      child: Image.network(
-                        'http://localhost:8000/${imagePaths[index]}',
-                        fit: BoxFit.cover,
-                      ),
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              elevation: 5,
+              child: Column(
+                children: [
+                  ClipRRect(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(15)),
+                    child: Image.network(
+                      'http://localhost:8000/${imagePaths[index]}',
+                      height: MediaQuery.of(context).size.height * 0.14,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
                     ),
                   ),
-                ),
-                SizedBox(height: 5.0),
-                Text(
-                  arts[index]['description'],
-                  style: TextStyle(color: Colors.black),
-                ),
-                SizedBox(height: 3.0),
-                Center(
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(Colors.blueGrey),
-                      shadowColor: MaterialStateProperty.all(Colors.black),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      arts[index]['description'],
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
+                  ),
+                  ElevatedButton(
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => BuyScreen()),
                       );
                     },
-                    child: Text(
-                      'Buy',
-                      style: TextStyle(color: Colors.black),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.blueGrey,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
+                    child: Text('Buy'),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
@@ -191,64 +187,41 @@ class _GalleryScreenState extends State<GalleryScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.blueGrey, Colors.blueGrey.withOpacity(0.5)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              bottomLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-              bottomRight: Radius.circular(20),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black38,
-                blurRadius: 10,
-                offset: Offset(0, 5),
-              ),
-            ],
+        child: AppBar(
+          centerTitle: true,
+          backgroundColor: Colors.blueGrey,
+          title: Text(
+            'Art Gallery',
+            style: TextStyle(
+                fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
           ),
-          child: AppBar(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                bottomLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-                bottomRight: Radius.circular(20),
-              ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => GalleryScreenAdmin()),
+                );
+              },
+              icon: Icon(Icons.admin_panel_settings),
             ),
-            centerTitle: true,
-            backgroundColor:
-                Colors.transparent, // Make AppBar background transparent
-            elevation: 0, // Remove AppBar's own shadow
-            title: Text('Art Gallery'),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => GalleryScreenAdmin()),
-                  );
-                },
-                icon: Icon(Icons.admin_panel_settings),
-              ),
-            ],
-          ),
+          ],
         ),
       ),
       drawer: Drawer(
         child: Container(
-          decoration: BoxDecoration(color: Colors.blueGrey.withOpacity(0.7)),
+          color: Colors.blueGrey.withOpacity(0.7),
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
               DrawerHeader(
-                decoration: BoxDecoration(color: Colors.blueGrey),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.blueGrey, Colors.blueGrey.withOpacity(0.5)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
                 child: profilePictureUrl != null
                     ? CircleAvatar(
                         radius: 50,
@@ -259,61 +232,141 @@ class _GalleryScreenState extends State<GalleryScreen> {
                         child: Icon(Icons.person, size: 50),
                       ),
               ),
-              ListTile(
-                leading: Icon(Icons.home),
-                title: Text(
-                  'Home',
-                  style: TextStyle(color: Colors.black),
-                ),
-                onTap: () {
-                  Navigator.pop(context); // Close the drawer
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.monetization_on),
-                title: Text(
-                  'Sell Art',
-                  style: TextStyle(color: Colors.black),
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => UploadScreen()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.person),
-                title: Text(
-                  'Profile',
-                  style: TextStyle(color: Colors.black),
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          ProfilePictureWidget(userId: widget.userId),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.exit_to_app),
-                title: Text(
-                  'Logout',
-                  style: TextStyle(color: Colors.black),
-                ),
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()));
-                },
-              ),
+              _buildDrawerItem(Icons.home, 'Home', () {
+                Navigator.pop(context);
+              }),
+              _buildDrawerItem(Icons.monetization_on, 'Sell Art', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SellingArtScreen()),
+                );
+              }),
+              _buildDrawerItem(Icons.person, 'Profile', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ProfilePictureWidget(userId: widget.userId),
+                  ),
+                );
+              }),
+              _buildDrawerItem(Icons.exit_to_app, 'Logout', () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()));
+              }),
             ],
           ),
         ),
       ),
-      body: _buildGallery(),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              onChanged: _searchArts,
+              decoration: InputDecoration(
+                hintText: 'Search art...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+            ),
+          ),
+          SizedBox(height: 10),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildCategoryButton('Home', Icons.home, () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          GalleryScreen(userId: 1),
+                    ),
+                  );
+                }),
+                _buildCategoryButton('Car', Icons.directions_car,() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          GalleryScreenAdmin(),
+                    ),
+                  );
+                }),
+                _buildCategoryButton('Chair', Icons.chair,() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          GalleryScreen(userId: 1),
+                    ),
+                  );
+                }),
+                _buildCategoryButton('Art', Icons.palette,() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          GalleryScreen(userId: 1),
+                    ),
+                  );
+                }),
+                _buildCategoryButton('Music', Icons.music_note,() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          GalleryScreen(userId: 1),
+                    ),
+                  );
+                }),
+                // Add more categories as needed
+              ],
+            ),
+          ),
+          Expanded(child: _buildGallery()),
+        ],
+      ),
     );
   }
+
+  Widget _buildCategoryButton(String label, IconData icon, VoidCallback onPressed) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon),
+        label: Text(label),
+        style: ElevatedButton.styleFrom(
+          foregroundColor: Colors.blueGrey,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.white),
+      title: Text(
+        title,
+        style: TextStyle(color: Colors.white),
+      ),
+      onTap: onTap,
+    );
+  }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: GalleryScreen(userId: 1),
+  ));
 }

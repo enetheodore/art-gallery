@@ -36,9 +36,6 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       final int statusCode = response.statusCode;
-      print("Response details: ${response.toString()}");
-      print("statusCode: ${response.statusCode}");
-      print("headers: ${response.headers}");
 
       if (statusCode >= 400) {
         String errorResponse = response.body;
@@ -96,65 +93,117 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Center(
           child: Stack(
             children: [
-              Image.asset(
-                'assets/images/bmw.png',
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width,
-                fit: BoxFit.cover,
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Card(
-                    color: Colors.white.withOpacity(0.7),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          TextField(
-                            controller: emailController,
-                            decoration: InputDecoration(labelText: 'Email'),
-                            keyboardType: TextInputType.emailAddress,
-                          ),
-                          TextField(
-                            controller: passwordController,
-                            decoration: InputDecoration(labelText: 'Password'),
-                            obscureText: true,
-                          ),
-                          SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed: () => login(context),
-                            child: Text('Login'),
-                          ),
-                          SizedBox(height: 10),
-                          if (message.isNotEmpty)
-                            Text(
-                              message,
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('Do not have an account?'),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => SignupScreen(),
-                                    ),
-                                  );
-                                },
-                                child: Text('Signup'),
-                              ),
-                            ],
-                          ),
-                        ],
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.blueGrey, Colors.black],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 20),
+                    Text(
+                      'Welcome Back!',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: 10),
+                    Text(
+                      'Log in to continue',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    SizedBox(height: 50),
+                    Card(
+                      color: Colors.white.withOpacity(0.8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextField(
+                              controller: emailController,
+                              decoration: InputDecoration(
+                                labelText: 'Email',
+                                labelStyle: TextStyle(color: Colors.blueGrey),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.blueGrey),
+                                ),
+                              ),
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+                            TextField(
+                              controller: passwordController,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                labelStyle: TextStyle(color: Colors.blueGrey),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.blueGrey),
+                                ),
+                              ),
+                              obscureText: true,
+                            ),
+                            SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: () => login(context),
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.blueGrey,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                              ),
+                              child: Text(
+                                'Login',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            if (message.isNotEmpty)
+                              Text(
+                                message,
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('Do not have an account?'),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => SignupScreen(),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    'Signup',
+                                    style: TextStyle(
+                                      color: Colors.blueGrey,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -162,4 +211,10 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: LoginScreen(),
+  ));
 }

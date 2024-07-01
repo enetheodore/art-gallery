@@ -71,7 +71,7 @@ class _UploadScreenState extends State<UploadScreen> {
       print('Image uploaded successfully');
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => BottomPage(userId: 0)),
+        MaterialPageRoute(builder: (context) => GalleryScreen(userId: 0)),
       );
     } else {
       print('Failed to upload image');

@@ -48,7 +48,7 @@ class BottomPageState extends State<BottomPage> {
           ? Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.blueGrey, Colors.blueGrey.withOpacity(0.5)],
+                  colors: [Colors.blueGrey, Colors.black],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -87,8 +87,8 @@ class BottomPageState extends State<BottomPage> {
                     ),
                   ],
                   currentIndex: _selectedIndex,
-                  selectedItemColor: Colors.black,
-                  unselectedItemColor: Colors.black.withOpacity(0.5),
+                  selectedItemColor: Colors.white,
+                  unselectedItemColor: Colors.white.withOpacity(0.5),
                   backgroundColor: Colors.transparent,
                   onTap: _onItemTapped,
                   showSelectedLabels: true,
