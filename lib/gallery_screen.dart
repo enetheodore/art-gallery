@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:art_gallery_app/buildPage.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'login_screen.dart';
@@ -24,6 +26,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
   String? profilePictureUrl;
   int _selectedIndex = 1;
   final TextEditingController _searchController = TextEditingController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -101,11 +104,11 @@ class _GalleryScreenState extends State<GalleryScreen> {
     return Container(
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.grey.withOpacity(0.1),
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.9),
+            color: Colors.grey.withOpacity(0.9),
             blurRadius: 10,
             offset: Offset(0, 5),
           ),
@@ -139,41 +142,44 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 borderRadius: BorderRadius.circular(15),
               ),
               elevation: 5,
-              child: Column(
-                children: [
-                  ClipRRect(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(15)),
-                    child: Image.network(
-                      'http://localhost:8000/${imagePaths[index]}',
-                      height: MediaQuery.of(context).size.height * 0.14,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      arts[index]['description'],
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => BuyScreen()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.blueGrey,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(15)),
+                      child: Image.network(
+                        'http://localhost:8000/${imagePaths[index]}',
+                        height: MediaQuery.of(context).size.height * 0.14,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    child: Text('Buy'),
-                  ),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        arts[index]['description'],
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => BuyScreen()),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.blueGrey,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text('Buy'),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -185,27 +191,92 @@ class _GalleryScreenState extends State<GalleryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: AppBar(
-          centerTitle: true,
-          backgroundColor: Colors.blueGrey,
-          title: Text(
-            'Art Gallery',
-            style: TextStyle(
-                fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-          actions: [
-            IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => GalleryScreenAdmin()),
-                );
-              },
-              icon: Icon(Icons.admin_panel_settings),
+          automaticallyImplyLeading: false,
+          title: Container(
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: Offset(0, 5),
+                ),
+              ],
             ),
-          ],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  height: 30,
+                  width: 30,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blueGrey.withOpacity(0.2),
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.menu,
+                      color: Colors.black,
+                      size: 15,
+                    ),
+                    onPressed: () {
+                      _scaffoldKey.currentState?.openDrawer();
+                    },
+                  ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.03,
+                ),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.blueGrey.withOpacity(0.2),
+                          blurRadius: 10,
+                          offset: Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    height: MediaQuery.of(context).size.height * 0.05,
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: _searchArts,
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(
+                          Icons.search,
+                          size: 15,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        fillColor: Colors.white,
+                        filled: true,
+                        contentPadding: EdgeInsets.symmetric(vertical: 10),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.03,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
       drawer: Drawer(
@@ -260,88 +331,207 @@ class _GalleryScreenState extends State<GalleryScreen> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              onChanged: _searchArts,
-              decoration: InputDecoration(
-                hintText: 'Search art...',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+          SizedBox(height: 3),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: Offset(0, 5),
                 ),
-                filled: true,
-                fillColor: Colors.white,
+              ],
+            ),
+          ),
+          SizedBox(height: 3),
+          Container(
+            height: MediaQuery.of(context).size.height * 0.2,
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: Offset(0, 5),
+                ),
+              ],
+            ),
+            child: CarouselSlider(
+              options: CarouselOptions(
+                height: 200.0,
+                autoPlay: true,
+                enlargeCenterPage: true,
               ),
+              items: imagePaths.map((imagePath) {
+                return Builder(
+                  builder: (BuildContext context) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BuyScreen(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        margin: EdgeInsets.symmetric(horizontal: 5.0),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.blueGrey.withOpacity(0.2),
+                              blurRadius: 10,
+                              offset: Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(15),
+                              child: Image.network(
+                                'http://localhost:8000/$imagePath',
+                                width: double.infinity,
+                                height: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.transparent,
+                                    Colors.black.withOpacity(0.6)
+                                  ],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 10,
+                              left: 10,
+                              child: Text(
+                                arts[imagePaths.indexOf(imagePath)]
+                                    ['description'],
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.black.withOpacity(0.7),
+                                      blurRadius: 10,
+                                      offset: Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }).toList(),
             ),
           ),
           SizedBox(height: 10),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _buildCategoryButton('Home', Icons.home, () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          GalleryScreen(userId: 1),
-                    ),
-                  );
-                }),
-                _buildCategoryButton('Car', Icons.directions_car,() {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          GalleryScreenAdmin(),
-                    ),
-                  );
-                }),
-                _buildCategoryButton('Chair', Icons.chair,() {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          GalleryScreen(userId: 1),
-                    ),
-                  );
-                }),
-                _buildCategoryButton('Art', Icons.palette,() {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          GalleryScreen(userId: 1),
-                    ),
-                  );
-                }),
-                _buildCategoryButton('Music', Icons.music_note,() {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          GalleryScreen(userId: 1),
-                    ),
-                  );
-                }),
-                // Add more categories as needed
-              ],
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.blueGrey.withOpacity(0.2),
+                    blurRadius: 10,
+                    offset: Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  SizedBox(
+                    height: 3,
+                  ),
+                  _buildCategoryButton('Home', Icons.home, () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BottomPage(userId: 1),
+                      ),
+                    );
+                  }),
+
+                  _buildCategoryButton('Car', Icons.directions_car, () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => GalleryScreenAdmin(),
+                      ),
+                    );
+                  }),
+
+                  _buildCategoryButton('Chair', Icons.chair, () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => GalleryScreen(userId: 1),
+                      ),
+                    );
+                  }),
+
+                  _buildCategoryButton('Art', Icons.palette, () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => GalleryScreen(userId: 1),
+                      ),
+                    );
+                  }),
+
+                  _buildCategoryButton('Music', Icons.music_note, () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => GalleryScreen(userId: 1),
+                      ),
+                    );
+                  }),
+
+                  // Add more categories as needed
+                ],
+              ),
             ),
           ),
+          SizedBox(height: 10),
           Expanded(child: _buildGallery()),
+          SizedBox(height: 10),
         ],
       ),
     );
   }
 
-  Widget _buildCategoryButton(String label, IconData icon, VoidCallback onPressed) {
+  Widget _buildCategoryButton(
+      String label, IconData icon, VoidCallback onPressed) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4.0),
       child: ElevatedButton.icon(
         onPressed: onPressed,
-        icon: Icon(icon),
+        icon: Icon(
+          icon,
+          size: 15,
+        ),
         label: Text(label),
         style: ElevatedButton.styleFrom(
           foregroundColor: Colors.blueGrey,

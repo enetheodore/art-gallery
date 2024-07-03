@@ -15,7 +15,7 @@ class BottomPage extends StatefulWidget {
 }
 
 class BottomPageState extends State<BottomPage> {
-  int _selectedIndex = 1; 
+  int _selectedIndex = 1;
   final List<Widget> _pages = [
     SellingArtScreen(),
     GalleryScreen(userId: 51),
@@ -46,23 +46,20 @@ class BottomPageState extends State<BottomPage> {
       body: _buildPage(),
       bottomNavigationBar: _showBottomNavBar[_selectedIndex]
           ? Container(
+              height: MediaQuery.of(context).size.height * 0.08,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blueGrey, Colors.black],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: Colors.grey.withOpacity(0.3),
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(20),
-                  bottomLeft: Radius.circular(20),
+                  //bottomLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
+                  //bottomRight: Radius.circular(20),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black38,
+                    color: Colors.blueGrey.withOpacity(0.2),
                     blurRadius: 10,
-                    offset: Offset(0, -2),
+                    offset: Offset(0, 5),
                   ),
                 ],
               ),
@@ -74,21 +71,30 @@ class BottomPageState extends State<BottomPage> {
                 child: BottomNavigationBar(
                   items: [
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.monetization_on),
+                      icon: Icon(
+                        Icons.monetization_on,
+                        size: 15,
+                      ),
                       label: 'Sell Art',
                     ),
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.home),
+                      icon: Icon(
+                        Icons.home,
+                        size: 15,
+                      ),
                       label: 'Home',
                     ),
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.person),
+                      icon: Icon(
+                        Icons.person,
+                        size: 15,
+                      ),
                       label: 'Sign up',
                     ),
                   ],
                   currentIndex: _selectedIndex,
-                  selectedItemColor: Colors.white,
-                  unselectedItemColor: Colors.white.withOpacity(0.5),
+                  selectedItemColor: Colors.black,
+                  unselectedItemColor: Colors.black.withOpacity(0.5),
                   backgroundColor: Colors.transparent,
                   onTap: _onItemTapped,
                   showSelectedLabels: true,

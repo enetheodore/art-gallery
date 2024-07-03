@@ -1,3 +1,4 @@
+import 'package:art_gallery_app/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'login_screen.dart';
 
@@ -90,7 +91,11 @@ class WelcomeScreen extends StatelessWidget {
                         SizedBox(height: 20),
                         TextButton(
                           onPressed: () {
-                            // Navigate to Sign Up screen
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SignupScreen()),
+                            );
                           },
                           child: Text(
                             'Create an Account',
