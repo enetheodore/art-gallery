@@ -11,7 +11,7 @@ class WelcomeScreen extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.blueGrey, Colors.black],
+                colors: [Colors.grey, Colors.blueGrey],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -41,7 +41,7 @@ class WelcomeScreen extends StatelessWidget {
                           'Discover the best products at amazing prices',
                           style: TextStyle(
                             fontSize: 18,
-                            color: Colors.white70,
+                            color: Colors.white,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -73,8 +73,8 @@ class WelcomeScreen extends StatelessWidget {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.black,
+                            backgroundColor: Colors.grey.withOpacity(0.3),
                             padding: EdgeInsets.symmetric(
                                 horizontal: 50, vertical: 15),
                             shape: RoundedRectangleBorder(
@@ -101,7 +101,7 @@ class WelcomeScreen extends StatelessWidget {
                             'Create an Account',
                             style: TextStyle(
                               fontSize: 18,
-                              color: Colors.white,
+                              color: Colors.black,
                               decoration: TextDecoration.underline,
                             ),
                           ),

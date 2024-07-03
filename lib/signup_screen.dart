@@ -131,7 +131,7 @@ class _SignupScreenState extends State<SignupScreen> {
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.blueGrey, Colors.black],
+                    colors: [Colors.grey, Colors.blueGrey],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),

@@ -57,7 +57,7 @@ class BottomPageState extends State<BottomPage> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.blueGrey.withOpacity(0.2),
+                    color: Colors.black.withOpacity(0.2),
                     blurRadius: 10,
                     offset: Offset(0, 5),
                   ),

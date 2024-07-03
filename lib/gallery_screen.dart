@@ -281,14 +281,14 @@ class _GalleryScreenState extends State<GalleryScreen> {
       ),
       drawer: Drawer(
         child: Container(
-          color: Colors.blueGrey.withOpacity(0.7),
+          color: Colors.blueGrey.withOpacity(0.3),
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
               DrawerHeader(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.blueGrey, Colors.blueGrey.withOpacity(0.5)],
+                    colors: [Colors.grey, Colors.blueGrey],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -331,20 +331,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
       ),
       body: Column(
         children: [
-          SizedBox(height: 3),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: Offset(0, 5),
-                ),
-              ],
-            ),
-          ),
           SizedBox(height: 3),
           Container(
             height: MediaQuery.of(context).size.height * 0.2,
