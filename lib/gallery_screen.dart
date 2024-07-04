@@ -281,7 +281,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
       ),
       drawer: Drawer(
         child: Container(
-          color: Colors.blueGrey.withOpacity(0.3),
+          color: Colors.grey.withOpacity(0.3),
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
@@ -333,174 +333,172 @@ class _GalleryScreenState extends State<GalleryScreen> {
         children: [
           SizedBox(height: 3),
           Container(
-            height: MediaQuery.of(context).size.height * 0.2,
             decoration: BoxDecoration(
               color: Colors.grey.withOpacity(0.3),
               borderRadius: BorderRadius.circular(15),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.blueGrey.withOpacity(0.2),
                   blurRadius: 10,
                   offset: Offset(0, 5),
                 ),
               ],
             ),
-            child: CarouselSlider(
-              options: CarouselOptions(
-                height: 200.0,
-                autoPlay: true,
-                enlargeCenterPage: true,
-              ),
-              items: imagePaths.map((imagePath) {
-                return Builder(
-                  builder: (BuildContext context) {
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BuyScreen(),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        margin: EdgeInsets.symmetric(horizontal: 5.0),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.blueGrey.withOpacity(0.2),
-                              blurRadius: 10,
-                              offset: Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(15),
-                              child: Image.network(
-                                'http://localhost:8000/$imagePath',
-                                width: double.infinity,
-                                height: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Container(
+            child: Column(
+              children: [
+                SizedBox(height: 10),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.2,
+                  child: CarouselSlider(
+                    options: CarouselOptions(
+                      height: 200.0,
+                      autoPlay: true,
+                      enlargeCenterPage: true,
+                    ),
+                    items: imagePaths.map((imagePath) {
+                      return Builder(
+                        builder: (BuildContext context) {
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => BuyScreen(),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width,
+                              margin: EdgeInsets.symmetric(horizontal: 5.0),
                               decoration: BoxDecoration(
+                                color: Colors.grey.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(15),
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.transparent,
-                                    Colors.black.withOpacity(0.6)
-                                  ],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.blueGrey.withOpacity(0.2),
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
                               ),
-                            ),
-                            Positioned(
-                              bottom: 10,
-                              left: 10,
-                              child: Text(
-                                arts[imagePaths.indexOf(imagePath)]
-                                    ['description'],
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  shadows: [
-                                    Shadow(
-                                      color: Colors.black.withOpacity(0.7),
-                                      blurRadius: 10,
-                                      offset: Offset(0, 5),
+                              child: Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(15),
+                                    child: Image.network(
+                                      'http://localhost:8000/$imagePath',
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      fit: BoxFit.cover,
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(15),
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Colors.transparent,
+                                          Colors.black.withOpacity(0.6)
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 10,
+                                    left: 10,
+                                    child: Text(
+                                      arts[imagePaths.indexOf(imagePath)]
+                                          ['description'],
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        shadows: [
+                                          Shadow(
+                                            color:
+                                                Colors.black.withOpacity(0.7),
+                                            blurRadius: 10,
+                                            offset: Offset(0, 5),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
+                          );
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
+                SizedBox(height: 10),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Container(
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          height: 3,
                         ),
-                      ),
-                    );
-                  },
-                );
-              }).toList(),
+                        _buildCategoryButton('Home', Icons.home, () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BottomPage(userId: 1),
+                            ),
+                          );
+                        }),
+
+                        _buildCategoryButton('Car', Icons.directions_car, () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => GalleryScreenAdmin(),
+                            ),
+                          );
+                        }),
+
+                        _buildCategoryButton('Chair', Icons.chair, () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => GalleryScreen(userId: 1),
+                            ),
+                          );
+                        }),
+
+                        _buildCategoryButton('Art', Icons.palette, () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => GalleryScreen(userId: 1),
+                            ),
+                          );
+                        }),
+
+                        _buildCategoryButton('Music', Icons.music_note, () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => GalleryScreen(userId: 1),
+                            ),
+                          );
+                        }),
+
+                        // Add more categories as needed
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
+              ],
             ),
           ),
-          SizedBox(height: 10),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.blueGrey.withOpacity(0.2),
-                    blurRadius: 10,
-                    offset: Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  SizedBox(
-                    height: 3,
-                  ),
-                  _buildCategoryButton('Home', Icons.home, () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BottomPage(userId: 1),
-                      ),
-                    );
-                  }),
-
-                  _buildCategoryButton('Car', Icons.directions_car, () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => GalleryScreenAdmin(),
-                      ),
-                    );
-                  }),
-
-                  _buildCategoryButton('Chair', Icons.chair, () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => GalleryScreen(userId: 1),
-                      ),
-                    );
-                  }),
-
-                  _buildCategoryButton('Art', Icons.palette, () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => GalleryScreen(userId: 1),
-                      ),
-                    );
-                  }),
-
-                  _buildCategoryButton('Music', Icons.music_note, () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => GalleryScreen(userId: 1),
-                      ),
-                    );
-                  }),
-
-                  // Add more categories as needed
-                ],
-              ),
-            ),
-          ),
-          SizedBox(height: 10),
+          SizedBox(height: 3),
           Expanded(child: _buildGallery()),
           SizedBox(height: 10),
         ],
@@ -531,10 +529,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
   Widget _buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
     return ListTile(
-      leading: Icon(icon, color: Colors.white),
+      leading: Icon(icon, color: Colors.black),
       title: Text(
         title,
-        style: TextStyle(color: Colors.white),
+        style: TextStyle(color: Colors.black),
       ),
       onTap: onTap,
     );
