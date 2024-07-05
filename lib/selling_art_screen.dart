@@ -207,7 +207,7 @@ class _UploadScreenState extends State<UploadScreen> {
     var request = http.MultipartRequest(
       'POST',
       Uri.parse('http://localhost:8000/api/upload'),
-    );
+    );  
     request.fields['description'] = _descriptionController.text;
     request.files.add(await http.MultipartFile.fromPath('image', _image!.path));
     var response = await request.send();
