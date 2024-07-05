@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+
 import 'login_screen.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -30,8 +34,9 @@ class _SignupScreenState extends State<SignupScreen> {
     });
   }
 
-  Future<void> signUp(BuildContext context) async {
-    final String baseUrl = 'http://localhost:8000/api/register1';
+//   
+Future<void> signUp(BuildContext context) async {
+    final String baseUrl = 'http://127.0.0.1:8000/api/register1';
 
     try {
       final response = await http.post(
@@ -48,7 +53,7 @@ class _SignupScreenState extends State<SignupScreen> {
       );
 
       if (response.statusCode == 201) {
-        final userId = jsonDecode(response.body)['user']['id'].toString(); // Adjust according to your server response
+        final userId = jsonDecode(response.body)['user']['email'];
         if (_profileImage != null) {
           await uploadProfilePicture(userId);
         }
@@ -70,7 +75,7 @@ class _SignupScreenState extends State<SignupScreen> {
     try {
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('http://localhost:8000/api/upload_profile_picture'),
+        Uri.parse('http://127.0.0.1:8000/api/upload_profile_picture'),
       );
       request.fields['userId'] = userId;
       request.files.add(await http.MultipartFile.fromPath(
@@ -291,10 +296,4 @@ class _SignupScreenState extends State<SignupScreen> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: SignupScreen(),
-  ));
 }

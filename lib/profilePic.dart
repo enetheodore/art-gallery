@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class ProfilePictureWidget extends StatefulWidget {
-  final int userId;
+  final String userId;
   final double size;
 
   const ProfilePictureWidget({
