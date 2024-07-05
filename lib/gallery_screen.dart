@@ -664,9 +664,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
               context,
               MaterialPageRoute(
                 builder: (context) => ArtDescriptionScreen(
-                  imageUrl: arts[index]['imageUrl'],
-                  title: '',
-                  artist: 'me',
+                  imageUrl: 'http://localhost:8000/${imagePaths[index]}',
+                  title: arts[index]['title'] ?? '',
+                  artist: arts[index]['artist'] ?? 'Unknown',
                   description: arts[index]['description'],
                 ),
               ),
