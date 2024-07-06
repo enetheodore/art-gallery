@@ -60,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => BottomPage(userId: userId),
+                builder: (context) => GalleryScreen(userId: ''),
               ),
             );
           } else {

@@ -548,6 +548,7 @@
 import 'dart:convert';
 
 import 'package:art_gallery_app/buildPage.dart';
+import 'package:art_gallery_app/signup_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -720,6 +721,43 @@ class _GalleryScreenState extends State<GalleryScreen> {
         );
       },
     );
+  }
+  void _onItemTapped(int index) async {
+    setState(() {
+      _selectedIndex = index;
+    });
+    switch (index) {
+      case 0:
+        await Future.delayed(Duration(seconds: 1));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => UploadScreen()),
+        );
+        break;
+      case 1:
+        await Future.delayed(Duration(seconds: 1));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => GalleryScreenAdmin()),
+        );
+        break;
+      case 2:
+        await Future.delayed(Duration(seconds: 1));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SignupScreen()),
+        );
+        break;
+      case 3:
+        await Future.delayed(Duration(seconds: 1));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BottomPage(userId: 1),
+            ));
+        break;
+    }
   }
 
   @override
@@ -1037,15 +1075,63 @@ class _GalleryScreenState extends State<GalleryScreen> {
           SizedBox(height: 10),
         ],
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     Navigator.push(
-      //       context,
-      //       MaterialPageRoute(builder: (context) => UploadScreen()),
-      //     );
-      //   },
-      //   child: Icon(Icons.add),
-      // ),
+      persistentFooterButtons: [
+        Container(
+          height: MediaQuery.of(context).size.height * 0.08,
+          decoration: BoxDecoration(
+            color: Colors.grey.withOpacity(0.3),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 10,
+                offset: Offset(0, 5),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+            child: BottomNavigationBar(
+              currentIndex: _selectedIndex,
+              items: [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.monetization_on, size: 15),
+                  label: 'Sell Art',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home, size: 15),
+                  label: 'Home',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.person, size: 15),
+                  label: 'Sign up',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.camera_outdoor_outlined, size: 15),
+                  label: 'Gallery page',
+                ),
+              ],
+              selectedItemColor: Colors.black,
+              unselectedItemColor: Colors.black.withOpacity(0.5),
+              backgroundColor: Colors.transparent,
+              showSelectedLabels: true,
+              showUnselectedLabels: true,
+              selectedFontSize: 14,
+              unselectedFontSize: 12,
+              type: BottomNavigationBarType.fixed,
+              elevation: 0,
+              onTap: _onItemTapped,
+            ),
+          ),
+        ),
+      ],
+      
     );
   }
 
