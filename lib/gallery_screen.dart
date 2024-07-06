@@ -1,565 +1,19 @@
-// import 'dart:convert';
-// import 'package:art_gallery_app/buildPage.dart';
-// import 'package:carousel_slider/carousel_slider.dart';
-// import 'package:flutter/material.dart';
-// import 'package:http/http.dart' as http;
-// import 'login_screen.dart';
-// import 'art_description_screen.dart';
-// import 'buy_screen.dart';
-// import 'selling_art_screen.dart';
-// import 'galleryScreenAdmin.dart';
-// import 'profilePic.dart';
-
-// class GalleryScreen extends StatefulWidget {
-//   final int userId;
-//   final String? profilePictureUrl;
-
-//   GalleryScreen({required this.userId, this.profilePictureUrl});
-
-//   @override
-//   _GalleryScreenState createState() => _GalleryScreenState();
-// }
-
-// class _GalleryScreenState extends State<GalleryScreen> {
-//   List<Map<String, dynamic>> arts = [];
-//   List<String> imagePaths = [];
-//   String? profilePictureUrl;
-//   int _selectedIndex = 1;
-//   final TextEditingController _searchController = TextEditingController();
-//   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     profilePictureUrl = widget.profilePictureUrl;
-//     fetchArtsDataFromServer();
-//     fetchProfilePicture();
-//   }
-
-//   Future<void> fetchProfilePicture() async {
-//     try {
-//       final response = await http.get(
-//         Uri.parse('http://localhost:8000/api/profile_picture/${widget.userId}'),
-//       );
-
-//       if (response.statusCode == 200) {
-//         final data = json.decode(response.body);
-//         setState(() {
-//           profilePictureUrl = 'http://localhost:8000${data['profile_picture']}';
-//         });
-//       } else if (response.statusCode == 404) {
-//         setState(() {
-//           profilePictureUrl = null;
-//         });
-//         print('Profile picture not found for userId ${widget.userId}');
-//       } else {
-//         print('Failed to load profile picture: ${response.statusCode}');
-//       }
-//     } catch (error) {
-//       print('Error fetching profile picture: $error');
-//     }
-//   }
-
-//   Future<void> fetchArtsDataFromServer() async {
-//     try {
-//       final response =
-//           await http.get(Uri.parse('http://localhost:8000/api/arts'));
-
-//       if (response.statusCode == 200) {
-//         final List<dynamic> responseData = json.decode(response.body);
-
-//         final List<String> fetchedImagePaths = [];
-//         final List<Map<String, dynamic>> fetchedArts = [];
-
-//         for (final item in responseData) {
-//           fetchedImagePaths.add(item['image_path']);
-//           fetchedArts.add(item);
-//         }
-
-//         setState(() {
-//           imagePaths = fetchedImagePaths;
-//           arts = fetchedArts;
-//         });
-//       } else {
-//         print('Failed to fetch arts data. Status code: ${response.statusCode}');
-//       }
-//     } catch (error) {
-//       print('Error fetching arts data: $error');
-//     }
-//   }
-
-//   void _searchArts(String query) {
-//     final filteredArts = arts.where((art) {
-//       final descriptionLower = art['description'].toLowerCase();
-//       final searchLower = query.toLowerCase();
-//       return descriptionLower.contains(searchLower);
-//     }).toList();
-
-//     setState(() {
-//       arts = filteredArts;
-//     });
-//   }
-
-//   Widget _buildGallery() {
-//     return Container(
-//       padding: const EdgeInsets.all(8.0),
-//       decoration: BoxDecoration(
-//         color: Colors.grey.withOpacity(0.1),
-//         borderRadius: BorderRadius.circular(15),
-//         boxShadow: [
-//           BoxShadow(
-//             color: Colors.grey.withOpacity(0.9),
-//             blurRadius: 10,
-//             offset: Offset(0, 5),
-//           ),
-//         ],
-//       ),
-//       child: GridView.builder(
-//         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-//           crossAxisCount: 2,
-//           crossAxisSpacing: 8.0,
-//           mainAxisSpacing: 8.0,
-//           childAspectRatio: 0.8,
-//         ),
-//         itemCount: arts.length,
-//         itemBuilder: (context, index) {
-//           return GestureDetector(
-//             onTap: () {
-//               Navigator.push(
-//                 context,
-//                 MaterialPageRoute(
-//                   builder: (context) => ArtDescriptionScreen(
-//                     imageUrl: 'http://localhost:8000/${imagePaths[index]}',
-//                     title: '',
-//                     artist: 'me',
-//                     description: arts[index]['description'],
-//                   ),
-//                 ),
-//               );
-//             },
-//             child: Card(
-//               shape: RoundedRectangleBorder(
-//                 borderRadius: BorderRadius.circular(15),
-//               ),
-//               elevation: 5,
-//               child: SingleChildScrollView(
-//                 scrollDirection: Axis.vertical,
-//                 child: Column(
-//                   children: [
-//                     ClipRRect(
-//                       borderRadius:
-//                           BorderRadius.vertical(top: Radius.circular(15)),
-//                       child: Image.network(
-//                         'http://localhost:8000/${imagePaths[index]}',
-//                         height: MediaQuery.of(context).size.height * 0.14,
-//                         width: double.infinity,
-//                         fit: BoxFit.cover,
-//                       ),
-//                     ),
-//                     Padding(
-//                       padding: const EdgeInsets.all(8.0),
-//                       child: Text(
-//                         arts[index]['description'],
-//                         style: TextStyle(fontWeight: FontWeight.bold),
-//                       ),
-//                     ),
-//                     ElevatedButton(
-//                       onPressed: () {
-//                         Navigator.push(
-//                           context,
-//                           MaterialPageRoute(builder: (context) => BuyScreen()),
-//                         );
-//                       },
-//                       style: ElevatedButton.styleFrom(
-//                         foregroundColor: Colors.blueGrey,
-//                         shape: RoundedRectangleBorder(
-//                           borderRadius: BorderRadius.circular(10),
-//                         ),
-//                       ),
-//                       child: Text('Buy'),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       key: _scaffoldKey,
-//       appBar: PreferredSize(
-//         preferredSize: Size.fromHeight(kToolbarHeight),
-//         child: AppBar(
-//           automaticallyImplyLeading: false,
-//           title: Container(
-//             decoration: BoxDecoration(
-//               color: Colors.grey.withOpacity(0.3),
-//               borderRadius: BorderRadius.circular(15),
-//               boxShadow: [
-//                 BoxShadow(
-//                   color: Colors.black.withOpacity(0.1),
-//                   blurRadius: 10,
-//                   offset: Offset(0, 5),
-//                 ),
-//               ],
-//             ),
-//             child: Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 Container(
-//                   height: 30,
-//                   width: 30,
-//                   decoration: BoxDecoration(
-//                     color: Colors.white,
-//                     borderRadius: BorderRadius.circular(15),
-//                     boxShadow: [
-//                       BoxShadow(
-//                         color: Colors.blueGrey.withOpacity(0.2),
-//                         blurRadius: 10,
-//                         offset: Offset(0, 5),
-//                       ),
-//                     ],
-//                   ),
-//                   child: IconButton(
-//                     icon: Icon(
-//                       Icons.menu,
-//                       color: Colors.black,
-//                       size: 15,
-//                     ),
-//                     onPressed: () {
-//                       _scaffoldKey.currentState?.openDrawer();
-//                     },
-//                   ),
-//                 ),
-//                 SizedBox(
-//                   width: MediaQuery.of(context).size.width * 0.03,
-//                 ),
-//                 Expanded(
-//                   child: Container(
-//                     decoration: BoxDecoration(
-//                       color: Colors.white,
-//                       borderRadius: BorderRadius.circular(15),
-//                       boxShadow: [
-//                         BoxShadow(
-//                           color: Colors.blueGrey.withOpacity(0.2),
-//                           blurRadius: 10,
-//                           offset: Offset(0, 5),
-//                         ),
-//                       ],
-//                     ),
-//                     height: MediaQuery.of(context).size.height * 0.05,
-//                     child: TextField(
-//                       controller: _searchController,
-//                       onChanged: _searchArts,
-//                       decoration: InputDecoration(
-//                         prefixIcon: Icon(
-//                           Icons.search,
-//                           size: 15,
-//                         ),
-//                         border: OutlineInputBorder(
-//                           borderRadius: BorderRadius.circular(20),
-//                         ),
-//                         fillColor: Colors.white,
-//                         filled: true,
-//                         contentPadding: EdgeInsets.symmetric(vertical: 10),
-//                       ),
-//                     ),
-//                   ),
-//                 ),
-//                 SizedBox(
-//                   width: MediaQuery.of(context).size.width * 0.03,
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//       drawer: Drawer(
-//         child: Container(
-//           color: Colors.grey.withOpacity(0.3),
-//           child: ListView(
-//             padding: EdgeInsets.zero,
-//             children: [
-//               DrawerHeader(
-//                 decoration: BoxDecoration(
-//                   gradient: LinearGradient(
-//                     colors: [Colors.grey, Colors.blueGrey],
-//                     begin: Alignment.topLeft,
-//                     end: Alignment.bottomRight,
-//                   ),
-//                 ),
-//                 child: profilePictureUrl != null
-//                     ? CircleAvatar(
-//                         radius: 50,
-//                         backgroundImage: NetworkImage(profilePictureUrl!),
-//                       )
-//                     : CircleAvatar(
-//                         radius: 50,
-//                         child: Icon(Icons.person, size: 50),
-//                       ),
-//               ),
-//               _buildDrawerItem(Icons.home, 'Home', () {
-//                 Navigator.pop(context);
-//               }),
-//               _buildDrawerItem(Icons.monetization_on, 'Sell Art', () {
-//                 Navigator.push(
-//                   context,
-//                   MaterialPageRoute(builder: (context) => SellingArtScreen()),
-//                 );
-//               }),
-//               _buildDrawerItem(Icons.person, 'Profile', () {
-//                 Navigator.push(
-//                   context,
-//                   MaterialPageRoute(
-//                     builder: (context) =>
-//                         ProfilePictureWidget(userId: widget.userId),
-//                   ),
-//                 );
-//               }),
-//               _buildDrawerItem(Icons.exit_to_app, 'Logout', () {
-//                 Navigator.push(context,
-//                     MaterialPageRoute(builder: (context) => LoginScreen()));
-//               }),
-//             ],
-//           ),
-//         ),
-//       ),
-//       body: Column(
-//         children: [
-//           SizedBox(height: 3),
-//           Container(
-//             decoration: BoxDecoration(
-//               color: Colors.grey.withOpacity(0.3),
-//               borderRadius: BorderRadius.circular(15),
-//               boxShadow: [
-//                 BoxShadow(
-//                   color: Colors.blueGrey.withOpacity(0.2),
-//                   blurRadius: 10,
-//                   offset: Offset(0, 5),
-//                 ),
-//               ],
-//             ),
-//             child: Column(
-//               children: [
-//                 SizedBox(height: 10),
-//                 Container(
-//                   height: MediaQuery.of(context).size.height * 0.2,
-//                   child: CarouselSlider(
-//                     options: CarouselOptions(
-//                       height: 200.0,
-//                       autoPlay: true,
-//                       enlargeCenterPage: true,
-//                     ),
-//                     items: imagePaths.map((imagePath) {
-//                       return Builder(
-//                         builder: (BuildContext context) {
-//                           return GestureDetector(
-//                             onTap: () {
-//                               Navigator.push(
-//                                 context,
-//                                 MaterialPageRoute(
-//                                   builder: (context) => BuyScreen(),
-//                                 ),
-//                               );
-//                             },
-//                             child: Container(
-//                               width: MediaQuery.of(context).size.width,
-//                               margin: EdgeInsets.symmetric(horizontal: 5.0),
-//                               decoration: BoxDecoration(
-//                                 color: Colors.grey.withOpacity(0.1),
-//                                 borderRadius: BorderRadius.circular(15),
-//                                 boxShadow: [
-//                                   BoxShadow(
-//                                     color: Colors.blueGrey.withOpacity(0.2),
-//                                     blurRadius: 10,
-//                                     offset: Offset(0, 5),
-//                                   ),
-//                                 ],
-//                               ),
-//                               child: Stack(
-//                                 children: [
-//                                   ClipRRect(
-//                                     borderRadius: BorderRadius.circular(15),
-//                                     child: Image.network(
-//                                       'http://localhost:8000/$imagePath',
-//                                       width: double.infinity,
-//                                       height: double.infinity,
-//                                       fit: BoxFit.cover,
-//                                     ),
-//                                   ),
-//                                   Container(
-//                                     decoration: BoxDecoration(
-//                                       borderRadius: BorderRadius.circular(15),
-//                                       gradient: LinearGradient(
-//                                         colors: [
-//                                           Colors.transparent,
-//                                           Colors.black.withOpacity(0.6)
-//                                         ],
-//                                         begin: Alignment.topCenter,
-//                                         end: Alignment.bottomCenter,
-//                                       ),
-//                                     ),
-//                                   ),
-//                                   Positioned(
-//                                     bottom: 10,
-//                                     left: 10,
-//                                     child: Text(
-//                                       arts[imagePaths.indexOf(imagePath)]
-//                                           ['description'],
-//                                       style: TextStyle(
-//                                         color: Colors.white,
-//                                         fontSize: 16,
-//                                         fontWeight: FontWeight.bold,
-//                                         shadows: [
-//                                           Shadow(
-//                                             color:
-//                                                 Colors.black.withOpacity(0.7),
-//                                             blurRadius: 10,
-//                                             offset: Offset(0, 5),
-//                                           ),
-//                                         ],
-//                                       ),
-//                                     ),
-//                                   ),
-//                                 ],
-//                               ),
-//                             ),
-//                           );
-//                         },
-//                       );
-//                     }).toList(),
-//                   ),
-//                 ),
-//                 SizedBox(height: 10),
-//                 SingleChildScrollView(
-//                   scrollDirection: Axis.horizontal,
-//                   child: Container(
-//                     child: Row(
-//                       children: [
-//                         SizedBox(
-//                           height: 3,
-//                         ),
-//                         _buildCategoryButton('Home', Icons.home, () {
-//                           Navigator.push(
-//                             context,
-//                             MaterialPageRoute(
-//                               builder: (context) => BottomPage(userId: 1),
-//                             ),
-//                           );
-//                         }),
-
-//                         _buildCategoryButton('Car', Icons.directions_car, () {
-//                           Navigator.push(
-//                             context,
-//                             MaterialPageRoute(
-//                               builder: (context) => GalleryScreenAdmin(),
-//                             ),
-//                           );
-//                         }),
-
-//                         _buildCategoryButton('Chair', Icons.chair, () {
-//                           Navigator.push(
-//                             context,
-//                             MaterialPageRoute(
-//                               builder: (context) => GalleryScreen(userId: 1),
-//                             ),
-//                           );
-//                         }),
-
-//                         _buildCategoryButton('Art', Icons.palette, () {
-//                           Navigator.push(
-//                             context,
-//                             MaterialPageRoute(
-//                               builder: (context) => GalleryScreen(userId: 1),
-//                             ),
-//                           );
-//                         }),
-
-//                         _buildCategoryButton('Music', Icons.music_note, () {
-//                           Navigator.push(
-//                             context,
-//                             MaterialPageRoute(
-//                               builder: (context) => GalleryScreen(userId: 1),
-//                             ),
-//                           );
-//                         }),
-
-//                         // Add more categories as needed
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-//                 SizedBox(height: 10),
-//               ],
-//             ),
-//           ),
-//           SizedBox(height: 3),
-//           Expanded(child: _buildGallery()),
-//           SizedBox(height: 10),
-//         ],
-//       ),
-//     );
-//   }
-
-//   Widget _buildCategoryButton(
-//       String label, IconData icon, VoidCallback onPressed) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(horizontal: 4.0),
-//       child: ElevatedButton.icon(
-//         onPressed: onPressed,
-//         icon: Icon(
-//           icon,
-//           size: 15,
-//         ),
-//         label: Text(label),
-//         style: ElevatedButton.styleFrom(
-//           foregroundColor: Colors.blueGrey,
-//           shape: RoundedRectangleBorder(
-//             borderRadius: BorderRadius.circular(20),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
-//     return ListTile(
-//       leading: Icon(icon, color: Colors.black),
-//       title: Text(
-//         title,
-//         style: TextStyle(color: Colors.black),
-//       ),
-//       onTap: onTap,
-//     );
-//   }
-// }
-
-// void main() {
-//   runApp(MaterialApp(
-//     home: GalleryScreen(userId: 1),
-//   ));
-// }
-// import 'dart:convert';
 import 'dart:convert';
 
-import 'package:art_gallery_app/buildPage.dart';
-import 'package:art_gallery_app/signup_screen.dart';
+import 'package:art_gallery_app/profilePic.dart';
+import 'package:art_gallery_app/selling_art_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+
 import 'login_screen.dart';
+import 'signup_screen.dart';
+import 'galleryScreenAdmin.dart';
 import 'art_description_screen.dart';
 import 'buy_screen.dart';
-import 'selling_art_screen.dart';
-import 'galleryScreenAdmin.dart';
-import 'profilePic.dart';
+
 
 class GalleryScreen extends StatefulWidget {
   final String userId;
@@ -573,10 +27,11 @@ class GalleryScreen extends StatefulWidget {
 class _GalleryScreenState extends State<GalleryScreen> {
   List<Map<String, dynamic>> arts = [];
   String? profilePictureUrl;
-  int _selectedIndex = 1;
   final TextEditingController _searchController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<String> imagePaths = [];
+  int page = 0;
+  int _selectedIndex = 1; 
 
   @override
   void initState() {
@@ -678,43 +133,44 @@ class _GalleryScreenState extends State<GalleryScreen> {
               borderRadius: BorderRadius.circular(15),
             ),
             elevation: 5,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Column(
-                children: [
-                  ClipRRect(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(15)),
-                    child: Image.network(
-                      'http://localhost:8000/${imagePaths[index]}',
-                      height: MediaQuery.of(context).size.height * 0.14,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      arts[index]['description'],
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => BuyScreen()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.blueGrey,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+            child: Center(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                      child: Image.network(
+                        'http://localhost:8000/${imagePaths[index]}',
+                        height: MediaQuery.of(context).size.height * 0.14,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    child: Text('Buy'),
-                  ),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        arts[index]['description'],
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => BuyScreen()),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.blueGrey,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text('Buy'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -722,39 +178,35 @@ class _GalleryScreenState extends State<GalleryScreen> {
       },
     );
   }
+
   void _onItemTapped(int index) async {
     setState(() {
       _selectedIndex = index;
     });
     switch (index) {
       case 0:
-        await Future.delayed(Duration(seconds: 1));
+        await Future.delayed(Duration(milliseconds: 400));
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => UploadScreen()),
         );
         break;
       case 1:
-        await Future.delayed(Duration(seconds: 1));
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => GalleryScreenAdmin()),
-        );
+        // Do nothing because it's the current screen
         break;
       case 2:
-        await Future.delayed(Duration(seconds: 1));
+        await Future.delayed(Duration(milliseconds: 400));
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => SignupScreen()),
         );
         break;
       case 3:
-        await Future.delayed(Duration(seconds: 1));
+        await Future.delayed(Duration(milliseconds: 400));
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => BottomPage(userId: 1),
+              builder: (context) => GalleryScreenAdmin(),
             ));
         break;
     }
@@ -867,12 +319,12 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 ),
                 child: profilePictureUrl != null
                     ? CircleAvatar(
-                        radius: 50,
+                        radius: 400,
                         backgroundImage: NetworkImage(profilePictureUrl!),
                       )
                     : CircleAvatar(
-                        radius: 50,
-                        child: Icon(Icons.person, size: 50),
+                        radius: 400,
+                        child: Icon(Icons.person, size: 400),
                       ),
               ),
               _buildDrawerItem(Icons.home, 'Home', () {
@@ -888,14 +340,15 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        ProfilePictureWidget(userId: widget.userId),
+                    builder: (context) => ProfilePictureWidget(userId: widget.userId),
                   ),
                 );
               }),
               _buildDrawerItem(Icons.exit_to_app, 'Logout', () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
               }),
             ],
           ),
@@ -1020,7 +473,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => BottomPage(userId: 1),
+                              builder: (context) => GalleryScreen(userId: ''),
                             ),
                           );
                         }),
@@ -1075,63 +528,22 @@ class _GalleryScreenState extends State<GalleryScreen> {
           SizedBox(height: 10),
         ],
       ),
-      persistentFooterButtons: [
-        Container(
-          height: MediaQuery.of(context).size.height * 0.08,
-          decoration: BoxDecoration(
-            color: Colors.grey.withOpacity(0.3),
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 10,
-                offset: Offset(0, 5),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-            child: BottomNavigationBar(
-              currentIndex: _selectedIndex,
-              items: [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.monetization_on, size: 15),
-                  label: 'Sell Art',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home, size: 15),
-                  label: 'Home',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.person, size: 15),
-                  label: 'Sign up',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.camera_outdoor_outlined, size: 15),
-                  label: 'Gallery page',
-                ),
-              ],
-              selectedItemColor: Colors.black,
-              unselectedItemColor: Colors.black.withOpacity(0.5),
-              backgroundColor: Colors.transparent,
-              showSelectedLabels: true,
-              showUnselectedLabels: true,
-              selectedFontSize: 14,
-              unselectedFontSize: 12,
-              type: BottomNavigationBarType.fixed,
-              elevation: 0,
-              onTap: _onItemTapped,
-            ),
-          ),
-        ),
-      ],
-      
+      bottomNavigationBar: CurvedNavigationBar(
+        index: _selectedIndex,
+        items: <Widget>[
+          Icon(Icons.upload_file_outlined, size: 20),
+          Icon(Icons.home, size: 20),
+          Icon(Icons.app_registration, size: 20),
+          Icon(Icons.admin_panel_settings, size: 20),
+          Icon(Icons.perm_identity, size: 20),
+        ],
+        color: Colors.blueGrey.withOpacity(0.2),
+        buttonBackgroundColor: Colors.blueGrey.withOpacity(0.2),
+        backgroundColor: Colors.white,
+        animationCurve: Curves.easeInOut,
+        animationDuration: Duration(milliseconds: 400),
+        onTap: _onItemTapped,
+      ),
     );
   }
 

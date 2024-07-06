@@ -1,22 +1,30 @@
 import 'dart:convert';
+import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:art_gallery_app/art_description_screen.dart';
 import 'package:art_gallery_app/buildPage.dart';
 import 'package:art_gallery_app/gallery_screen.dart';
 import 'package:art_gallery_app/selling_art_screen.dart';
 import 'package:art_gallery_app/signup_screen.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class GalleryScreenAdmin extends StatefulWidget {
   @override
-  _GalleryScreenState createState() => _GalleryScreenState();
+  _GalleryScreenAdminState createState() => _GalleryScreenAdminState();
 }
 
-class _GalleryScreenState extends State<GalleryScreenAdmin> {
+class _GalleryScreenAdminState extends State<GalleryScreenAdmin> {
   List<Map<String, dynamic>> arts = [];
   List<String> imagePaths = [];
   bool isLoading = false;
-  int _selectedIndex = 1;
+  int _selectedIndex = 3;
+  final List<IconData> icons = [
+    Icons.monetization_on,
+    Icons.home,
+    Icons.person,
+    Icons.camera_outdoor_outlined,
+  ];
 
   @override
   void initState() {
@@ -95,34 +103,27 @@ class _GalleryScreenState extends State<GalleryScreenAdmin> {
     });
     switch (index) {
       case 0:
-        await Future.delayed(Duration(seconds: 1));
+        await Future.delayed(Duration(milliseconds: 400));
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => UploadScreen()),
         );
         break;
       case 1:
-        await Future.delayed(Duration(seconds: 1));
+        await Future.delayed(Duration(milliseconds: 400));
         Navigator.push(
           context,
-          MaterialPageRoute(
-              builder: (context) => GalleryScreenAdmin()),
+          MaterialPageRoute(builder: (context) => GalleryScreen(userId: '')),
         );
         break;
       case 2:
-        await Future.delayed(Duration(seconds: 1));
+        await Future.delayed(Duration(milliseconds: 400));
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => SignupScreen()),
         );
         break;
       case 3:
-        await Future.delayed(Duration(seconds: 1));
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BottomPage(userId: 1),
-            ));
         break;
     }
   }
@@ -153,7 +154,10 @@ class _GalleryScreenState extends State<GalleryScreenAdmin> {
                 Center(
                   child: Container(
                     height: MediaQuery.of(context).size.height * 0.05,
-                    child: Text('Gallery Admin'),
+                    child: Text(
+                      'Gallery Admin',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
                 SizedBox(width: MediaQuery.of(context).size.width * 0.03),
@@ -244,62 +248,22 @@ class _GalleryScreenState extends State<GalleryScreenAdmin> {
                 },
               ),
       ),
-      persistentFooterButtons: [
-        Container(
-          height: MediaQuery.of(context).size.height * 0.08,
-          decoration: BoxDecoration(
-            color: Colors.grey.withOpacity(0.3),
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 10,
-                offset: Offset(0, 5),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-            child: BottomNavigationBar(
-              currentIndex: _selectedIndex,
-              items: [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.monetization_on, size: 15),
-                  label: 'Sell Art',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home, size: 15),
-                  label: 'Home',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.person, size: 15),
-                  label: 'Sign up',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.camera_outdoor_outlined, size: 15),
-                  label: 'Gallery page',
-                ),
-              ],
-              selectedItemColor: Colors.black,
-              unselectedItemColor: Colors.black.withOpacity(0.5),
-              backgroundColor: Colors.transparent,
-              showSelectedLabels: true,
-              showUnselectedLabels: true,
-              selectedFontSize: 14,
-              unselectedFontSize: 12,
-              type: BottomNavigationBarType.fixed,
-              elevation: 0,
-              onTap: _onItemTapped,
-            ),
-          ),
-        ),
-      ],
+      bottomNavigationBar: CurvedNavigationBar(
+        index: _selectedIndex,
+        items: <Widget>[
+          Icon(Icons.upload_file_outlined, size: 20),
+          Icon(Icons.home, size: 20),
+          Icon(Icons.app_registration, size: 20),
+          Icon(Icons.admin_panel_settings, size: 20),
+          Icon(Icons.perm_identity, size: 20),
+        ],
+        color: Colors.blueGrey.withOpacity(0.2),
+        buttonBackgroundColor: Colors.blueGrey.withOpacity(0.2),
+        backgroundColor: Colors.white,
+        animationCurve: Curves.easeInOut,
+        animationDuration: Duration(milliseconds: 400),
+        onTap: _onItemTapped,
+      ),
     );
   }
 }
